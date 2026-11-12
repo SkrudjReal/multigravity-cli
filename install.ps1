@@ -40,7 +40,7 @@ if (!$IN_PATH) {
 
 # Download raw bytes and write UTF-8 with BOM for Windows PowerShell 5.1.
 $UTF8BOM = New-Object System.Text.UTF8Encoding($true)
-foreach ($name in @("multigravity.ps1", "multigravity-gui.ps1")) {
+foreach ($name in @("multigravity.ps1", "multigravity-gui.ps1", "multigravity-gui-launcher.cs")) {
     Write-Step "Downloading $name..."
     $tempFile = Join-Path $INSTALL_DIR ($name + ".download")
     try {
@@ -86,6 +86,41 @@ try {
     if (Test-Path -LiteralPath $iconTmp) { Remove-Item -LiteralPath $iconTmp -Force }
 }
 
+# Build a tiny Windows GUI host with a native executable icon. This keeps
+# the taskbar from showing powershell.exe, rather than just changing the
+# shortcut image. If the compiler is unavailable, the WPF script still works.
+$exePath = Join-Path $INSTALL_DIR 'MultigravityProfileManager.exe'
+$launcherSource = Join-Path $INSTALL_DIR 'multigravity-gui-launcher.cs'
+$compilerPaths = @(
+    (Join-Path $env:WINDIR 'Microsoft.NET\Framework64\v4.0.30319\csc.exe'),
+    (Join-Path $env:WINDIR 'Microsoft.NET\Framework\v4.0.30319\csc.exe')
+)
+$cscPath = $compilerPaths | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+if ($cscPath -and (Test-Path -LiteralPath $icoPath)) {
+    Write-Step "Building standalone GUI launcher..."
+    try {
+        $automationAssembly = [System.Management.Automation.PSObject].Assembly.Location
+        $compilerArguments = @(
+            '/nologo', '/target:winexe',
+            ('/out:"' + $exePath + '"'),
+            ('/win32icon:"' + $icoPath + '"'),
+            ('/reference:"' + $automationAssembly + '"'),
+            '/reference:System.Core.dll',
+            '/reference:System.Windows.Forms.dll',
+            ('"' + $launcherSource + '"')
+        )
+        $compilerOutput = & $cscPath @compilerArguments 2>&1 | Out-String
+        if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $exePath)) {
+            throw "C# compiler failed: $compilerOutput"
+        }
+    } catch {
+        Write-Warning "Native GUI host could not be built: $_"
+        if (Test-Path -LiteralPath $exePath) { Remove-Item -LiteralPath $exePath -Force }
+    }
+} else {
+    Write-Warning "C# compiler or icon not available; PowerShell WPF fallback will be used."
+}
+
 Write-Step "Creating wrapper script..."
 $wrapper = @"
 @echo off
@@ -101,9 +136,14 @@ try {
     $shortcutPath = Join-Path $menuPath 'Multigravity Profile Manager.lnk'
     $shell = New-Object -ComObject WScript.Shell
     $shortcut = $shell.CreateShortcut($shortcutPath)
-    $shortcut.TargetPath = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
-    $guiFile = Join-Path $INSTALL_DIR 'multigravity-gui.ps1'
-    $shortcut.Arguments = '-NoProfile -STA -ExecutionPolicy Bypass -WindowStyle Hidden -File "' + $guiFile + '"'
+    if (Test-Path -LiteralPath $exePath) {
+        $shortcut.TargetPath = $exePath
+        $shortcut.Arguments = ''
+    } else {
+        $shortcut.TargetPath = Join-Path $env:SystemRoot 'System32\WindowsPowerShell\v1.0\powershell.exe'
+        $guiFile = Join-Path $INSTALL_DIR 'multigravity-gui.ps1'
+        $shortcut.Arguments = '-NoProfile -STA -ExecutionPolicy Bypass -WindowStyle Hidden -File "' + $guiFile + '"'
+    }
     $shortcut.WorkingDirectory = $INSTALL_DIR
     $shortcut.Description = 'Manage Antigravity IDE profiles'
     if (Test-Path -LiteralPath $icoPath) { $shortcut.IconLocation = "$icoPath,0" }
