@@ -66,7 +66,7 @@ namespace Multigravity {
             sky.Children.Add(glow);
             var drift = new DoubleAnimation {
                 From = x - 22, To = x + 36,
-                Duration = TimeSpan.FromSeconds(seconds),
+                Duration = new Duration(TimeSpan.FromSeconds(seconds)),
                 AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever
             };
             glow.BeginAnimation(Canvas.LeftProperty, drift);
@@ -85,7 +85,7 @@ namespace Multigravity {
             var fall = new DoubleAnimation {
                 From = -50 - random.NextDouble() * 830,
                 To = 1110,
-                Duration = TimeSpan.FromSeconds(17 + random.NextDouble() * 15),
+                Duration = new Duration(TimeSpan.FromSeconds(17 + random.NextDouble() * 15)),
                 RepeatBehavior = RepeatBehavior.Forever
             };
             flake.BeginAnimation(Canvas.TopProperty, fall);
@@ -148,7 +148,7 @@ namespace Multigravity {
             LinkedListNode<UIElement> node = alive.AddLast(dot);
             var fade = new DoubleAnimation {
                 From = dot.Opacity, To = 0.0,
-                Duration = TimeSpan.FromSeconds(seconds),
+                Duration = new Duration(TimeSpan.FromSeconds(seconds)),
                 FillBehavior = FillBehavior.Stop
             };
             fade.Completed += delegate(object sender, EventArgs args) {
@@ -158,11 +158,11 @@ namespace Multigravity {
             dot.BeginAnimation(UIElement.OpacityProperty, fade);
             dot.BeginAnimation(Canvas.LeftProperty, new DoubleAnimation {
                 From = x - size / 2, To = x + dx - size / 2,
-                Duration = TimeSpan.FromSeconds(seconds)
+                Duration = new Duration(TimeSpan.FromSeconds(seconds))
             });
             dot.BeginAnimation(Canvas.TopProperty, new DoubleAnimation {
                 From = y - size / 2, To = y + dy - size / 2,
-                Duration = TimeSpan.FromSeconds(seconds)
+                Duration = new Duration(TimeSpan.FromSeconds(seconds))
             });
         }
 
