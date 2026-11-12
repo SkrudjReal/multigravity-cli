@@ -28,7 +28,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
 <Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Multigravity | Profile Manager"
-        Width="980" Height="660" MinWidth="780" MinHeight="550"
+        Width="1060" Height="740" MinWidth="450" MinHeight="380"
         WindowStartupLocation="CenterScreen"
         Background="#0B1020" Foreground="#EAF0FF"
         FontFamily="Segoe UI" FontSize="13">
@@ -77,7 +77,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             </Style.Triggers>
         </Style>
     </Window.Resources>
-    <Grid Margin="24">
+    <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="20"/>
@@ -85,7 +85,11 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             <RowDefinition Height="16"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid Grid.Row="0">
+        <Grid x:Name="HeaderLayout" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -100,18 +104,24 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             <Button x:Name="RefreshButton" Grid.Column="1"
                     Content="Refresh profiles" VerticalAlignment="Bottom"/>
         </Grid>
-        <Grid Grid.Row="2">
+        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled" Focusable="False">
+          <Grid x:Name="ProfilesLayout">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1.1*"/>
                 <ColumnDefinition Width="18"/>
                 <ColumnDefinition Width="1*"/>
             </Grid.ColumnDefinitions>
-            <Border Grid.Column="0" Background="#11192D" CornerRadius="16" Padding="19">
+            <Border x:Name="ProfilesPanel" Grid.Column="0" Background="#11192D" CornerRadius="16" Padding="19" MinHeight="410">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="12"/>
-                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="18"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
@@ -120,7 +130,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         <TextBlock x:Name="CountText" Text="0 profiles" DockPanel.Dock="Right"
                                    Foreground="#7E8CAB" HorizontalAlignment="Right"/>
                     </DockPanel>
-                    <ListBox x:Name="ProfileList" Grid.Row="2"
+                    <ListBox x:Name="ProfileList" Grid.Row="2" MaxHeight="360" MinHeight="160"
                              Background="Transparent" BorderThickness="0"
                              ScrollViewer.HorizontalScrollBarVisibility="Disabled">
                         <ListBox.ItemTemplate>
@@ -150,16 +160,16 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         <TextBlock Text="NEW PROFILE" Foreground="#A8B6DA"
                                    FontWeight="SemiBold" Margin="0,0,0,7"/>
                         <TextBox x:Name="NewNameInput" MaxLength="64"/>
-                        <DockPanel Margin="0,10,0,0">
-                            <CheckBox x:Name="SharedCheck" Content="Shared extensions and settings"
+                        <WrapPanel Margin="0,10,0,0">
+                            <CheckBox x:Name="SharedCheck" Margin="0,0,8,8" Content="Shared extensions and settings"
                                       Foreground="#B6C4E6" VerticalAlignment="Center"/>
                             <Button x:Name="CreateButton" Style="{StaticResource AccentButton}"
-                                    Content="Create" DockPanel.Dock="Right" Margin="10,0,0,0"/>
-                        </DockPanel>
+                                    Content="Create" MinWidth="110" Margin="0,0,0,8"/>
+                        </WrapPanel>
                     </StackPanel>
                 </Grid>
             </Border>
-            <Border Grid.Column="2" Background="#11192D" CornerRadius="16" Padding="22">
+            <Border x:Name="DetailsPanel" Grid.Column="2" Background="#11192D" CornerRadius="16" Padding="22">
                 <StackPanel>
                     <TextBlock Text="SELECTED PROFILE" FontWeight="SemiBold"
                                Foreground="#A8B6DA"/>
@@ -172,9 +182,9 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                     <Button x:Name="LaunchButton" Content="Launch Antigravity"
                             Style="{StaticResource AccentButton}" Margin="0,0,0,9"/>
                     <CheckBox x:Name="IsolatedAuthCheck"
-                              Content="Independent login (experimental)"
+                              Content="Independent login"
                               Foreground="#B6C4E6" Margin="0,3,0,7"/>
-                    <TextBlock Text="When enabled, login tokens may be stored in profile files instead of Windows Credential Manager."
+                    <TextBlock Text="Keeps account credentials in this profile instead of the shared Windows credential store. Protect your profile files."
                                TextWrapping="Wrap" FontSize="11"
                                Foreground="#91A1C2" Margin="0,0,0,11"/>
                     <Button x:Name="OpenFolderButton" Content="Open profile folder"
@@ -193,18 +203,44 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                 </StackPanel>
             </Border>
         </Grid>
-        <DockPanel Grid.Row="4">
-            <TextBlock x:Name="StatusText" Foreground="#99AAD1"
+        </ScrollViewer>
+        <Grid Grid.Row="4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <TextBlock x:Name="StatusText" Grid.Column="0" Foreground="#99AAD1"
                        Text="Ready." TextTrimming="CharacterEllipsis"/>
-            <TextBlock Text="Windows PowerShell 5.1 / WPF"
-                       Foreground="#667898" DockPanel.Dock="Right"/>
-        </DockPanel>
+            <TextBlock Grid.Column="1" Text="Windows PowerShell 5.1 / WPF"
+                       Margin="12,0,0,0" Foreground="#667898"/>
+        </Grid>
     </Grid>
 </Window>
 '@
 
 $reader = New-Object System.Xml.XmlNodeReader $xaml
 $script:Window = [Windows.Markup.XamlReader]::Load($reader)
+
+# Set the window and taskbar icon from the icon bundled by install.ps1.
+$iconPath = Join-Path $PSScriptRoot 'multigravity-gui-icon.png'
+if (Test-Path -LiteralPath $iconPath) {
+    $iconStream = $null
+    try {
+        $iconBytes = [System.IO.File]::ReadAllBytes($iconPath)
+        $iconStream = New-Object System.IO.MemoryStream (,$iconBytes)
+        $bitmap = New-Object System.Windows.Media.Imaging.BitmapImage
+        $bitmap.BeginInit()
+        $bitmap.CacheOption = [System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad
+        $bitmap.StreamSource = $iconStream
+        $bitmap.EndInit()
+        $bitmap.Freeze()
+        $script:Window.Icon = $bitmap
+    } catch {
+        Write-Warning "Could not load Multigravity window icon: $_"
+    } finally {
+        if ($null -ne $iconStream) { $iconStream.Dispose() }
+    }
+}
 $script:ProfileList = $script:Window.FindName('ProfileList')
 $script:CountText = $script:Window.FindName('CountText')
 $script:SelectedName = $script:Window.FindName('SelectedName')
@@ -214,6 +250,47 @@ $script:RenameInput = $script:Window.FindName('RenameInput')
 $script:NewNameInput = $script:Window.FindName('NewNameInput')
 $script:SharedCheck = $script:Window.FindName('SharedCheck')
 $script:StatusText = $script:Window.FindName('StatusText')
+$script:ProfilesLayout = $script:Window.FindName('ProfilesLayout')
+$script:DetailsPanel = $script:Window.FindName('DetailsPanel')
+$script:RefreshButton = $script:Window.FindName('RefreshButton')
+$script:HeaderLayout = $script:Window.FindName('HeaderLayout')
+$script:LayoutIsNarrow = $null
+
+function Update-ResponsiveLayout {
+    $narrow = $script:Window.ActualWidth -lt 900
+    if ($null -ne $script:LayoutIsNarrow -and $narrow -eq $script:LayoutIsNarrow) {
+        return
+    }
+    $script:LayoutIsNarrow = $narrow
+    $cols = $script:ProfilesLayout.ColumnDefinitions
+    if ($narrow) {
+        $cols[0].Width = [System.Windows.GridLength]::new(1, [System.Windows.GridUnitType]::Star)
+        $cols[1].Width = [System.Windows.GridLength]::new(0)
+        $cols[2].Width = [System.Windows.GridLength]::new(0)
+        [System.Windows.Controls.Grid]::SetColumn($script:DetailsPanel, 0)
+        [System.Windows.Controls.Grid]::SetRow($script:DetailsPanel, 1)
+        $script:DetailsPanel.Margin = [System.Windows.Thickness]::new(0, 16, 0, 0)
+
+        [System.Windows.Controls.Grid]::SetColumn($script:RefreshButton, 0)
+        [System.Windows.Controls.Grid]::SetRow($script:RefreshButton, 1)
+        $script:RefreshButton.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Left
+        $script:RefreshButton.Margin = [System.Windows.Thickness]::new(0, 12, 0, 0)
+    } else {
+        $cols[0].Width = [System.Windows.GridLength]::new(1.1, [System.Windows.GridUnitType]::Star)
+        $cols[1].Width = [System.Windows.GridLength]::new(18)
+        $cols[2].Width = [System.Windows.GridLength]::new(1, [System.Windows.GridUnitType]::Star)
+        [System.Windows.Controls.Grid]::SetColumn($script:DetailsPanel, 2)
+        [System.Windows.Controls.Grid]::SetRow($script:DetailsPanel, 0)
+        $script:DetailsPanel.Margin = [System.Windows.Thickness]::new(0)
+
+        [System.Windows.Controls.Grid]::SetColumn($script:RefreshButton, 1)
+        [System.Windows.Controls.Grid]::SetRow($script:RefreshButton, 0)
+        $script:RefreshButton.HorizontalAlignment = [System.Windows.HorizontalAlignment]::Stretch
+        $script:RefreshButton.Margin = [System.Windows.Thickness]::new(0)
+    }
+}
+$script:Window.Add_SizeChanged({ Update-ResponsiveLayout })
+$script:Window.Add_Loaded({ Update-ResponsiveLayout })
 $script:Items = New-Object 'System.Collections.ObjectModel.ObservableCollection[Object]'
 $script:ProfileList.ItemsSource = $script:Items
 
