@@ -47,6 +47,24 @@ foreach ($control in @('ProfileList', 'RefreshButton', 'CreateButton', 'LaunchBu
     }
 }
 Write-Host 'PASS: embedded XAML parses and all required controls exist.'
+
+# The main Grid must assign Grid.Background BEFORE adding any child.
+# If FxSky is placed first, XamlReader throws:
+# 'Children property has already been set on Grid.'
+$mainGrid = $xaml.DocumentElement.SelectSingleNode("*[local-name()='Grid']")
+if ($null -eq $mainGrid) { throw 'Window main Grid not found.' }
+$children = @($mainGrid.ChildNodes | Where-Object {
+    $_.NodeType -eq [System.Xml.XmlNodeType]::Element
+})
+if ($children.Count -lt 2 -or $children[0].LocalName -ne 'Grid.Background') {
+    throw 'Main Grid.Background must come before the first Canvas or other visual child.'
+}
+if ($children[1].LocalName -ne 'Canvas' -or
+    $children[1].GetAttribute('Name', 'http://schemas.microsoft.com/winfx/2006/xaml') -ne 'FxSky') {
+    throw 'FxSky must follow Grid.Background as the first visual child.'
+}
+Write-Host 'PASS: WPF root Grid background and child order.'
+
 $cliSource = [System.IO.File]::ReadAllText(
     (Join-Path $root 'multigravity.ps1'),
     [System.Text.Encoding]::UTF8)
