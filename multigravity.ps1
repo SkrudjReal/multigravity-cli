@@ -197,9 +197,9 @@ function Invoke-LaunchProfile {
 
         if ($isolatedAuth) {
             $env:SSH_CONNECTION = '127.0.0.1 1234 127.0.0.1 22'
-            Write-Warning 'Experimental file-based auth enabled. OAuth credentials may be stored unencrypted in this profile.'
+            Write-Host 'Note: experimental file-based auth enabled; OAuth credentials may be stored in this profile.'
         } else {
-            Write-Warning 'Windows Credential Manager may share Google login between profiles. Use --isolated-auth to test file-based auth.'
+            Write-Host 'Note: Windows Credential Manager may share Google logins. Add --isolated-auth to opt in to file-based auth.'
         }
 
         Write-Host "Launching Antigravity profile '$PROFILE'"
