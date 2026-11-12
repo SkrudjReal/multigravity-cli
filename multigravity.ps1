@@ -64,6 +64,7 @@ function Write-Usage {
     Write-Host "      --from <template>        Seed from a saved template"
     Write-Host "  list                        List existing profiles"
     Write-Host "  gui                         Open the Windows WPF profile manager"
+    Write-Host "  <profile> --isolated-auth   Experimental profile-local OAuth token storage"
     Write-Host "  status                      Show running state, type, and last-used per profile"
     Write-Host "  rename <old> <new>          Rename a profile (updates shortcut if present)"
     Write-Host "  delete <name>               Delete a profile and its data"
@@ -144,39 +145,75 @@ function Invoke-LaunchProfile {
     param($PROFILE, $ArgsToForward)
     $PROFILE_DIR = "$BASE\$PROFILE"
 
-    if (!(Test-Path $PROFILE_DIR)) {
+    if (!(Test-Path -LiteralPath $PROFILE_DIR)) {
         Write-Error "Error: profile '$PROFILE' does not exist. Run: multigravity new $PROFILE"
-        exit 1
+        return
     }
-
-    if ([string]::IsNullOrEmpty($APP) -or !(Test-Path $APP)) {
+    if ([string]::IsNullOrEmpty($APP) -or !(Test-Path -LiteralPath $APP)) {
         Write-Error "Error: Antigravity.exe not found"
-        exit 1
+        return
     }
 
-    Write-Host "Launching Antigravity profile '$PROFILE'"
-    
-    # Start-Process inherits this environment, but the shell must not keep it.
+    # The process environment alone is not enough: Electron/VS Code can
+    # reuse a running default instance unless user-data-dir is explicit.
+    # Keep the path aligned with existing profiles to preserve their data.
+    $userDataDir = Join-Path $PROFILE_DIR 'AppData\Roaming\Antigravity'
+    $extensionsDir = Join-Path $PROFILE_DIR '.antigravity\extensions'
+    New-Item -ItemType Directory -Path $userDataDir -Force | Out-Null
+
+    $isolatedAuth = $env:MULTIGRAVITY_FILE_AUTH -eq '1'
+    $forwarded = @()
+    foreach ($argument in @($ArgsToForward)) {
+        if ([string]::IsNullOrEmpty($argument)) { continue }
+        if ($argument -eq '--isolated-auth') {
+            $isolatedAuth = $true
+            continue
+        }
+        if ($argument -match '^--(?:user-data-dir|extensions-dir)(?:=|$)') {
+            Write-Error 'Do not override --user-data-dir or --extensions-dir: Multigravity manages these for profile isolation.'
+            return
+        }
+        # Start-Process joins ArgumentList with spaces, so quote each value.
+        $forwarded += '"' + $argument.Replace('"', '\"') + '"'
+    }
+    $launchArgs = @(
+        ('--user-data-dir="' + $userDataDir + '"'),
+        ('--extensions-dir="' + $extensionsDir + '"')
+    ) + $forwarded
+
+    # Explicit opt-in: this remote-session marker reportedly makes Antigravity
+    # use profile-local files instead of the shared Windows Credential Manager.
+    # It is undocumented behavior and is not guaranteed in future releases.
     $originalUserProfile = $env:USERPROFILE
     $originalAppData = $env:APPDATA
     $originalLocalAppData = $env:LOCALAPPDATA
+    $hadSSHConnection = Test-Path Env:\SSH_CONNECTION
+    $originalSSHConnection = $env:SSH_CONNECTION
 
     try {
         $env:USERPROFILE = $PROFILE_DIR
-        $env:APPDATA = "$PROFILE_DIR\AppData\Roaming"
-        $env:LOCALAPPDATA = "$PROFILE_DIR\AppData\Local"
+        $env:APPDATA = Join-Path $PROFILE_DIR 'AppData\Roaming'
+        $env:LOCALAPPDATA = Join-Path $PROFILE_DIR 'AppData\Local'
 
-        if ($ArgsToForward) {
-            Start-Process -FilePath $APP -ArgumentList $ArgsToForward
+        if ($isolatedAuth) {
+            $env:SSH_CONNECTION = '127.0.0.1 1234 127.0.0.1 22'
+            Write-Warning 'Experimental file-based auth enabled. OAuth credentials may be stored unencrypted in this profile.'
+        } else {
+            Write-Warning 'Windows Credential Manager may share Google login between profiles. Use --isolated-auth to test file-based auth.'
         }
-        else {
-            Start-Process -FilePath $APP
-        }
+
+        Write-Host "Launching Antigravity profile '$PROFILE'"
+        Start-Process -FilePath $APP -ArgumentList $launchArgs -ErrorAction Stop
     }
     finally {
         $env:USERPROFILE = $originalUserProfile
         $env:APPDATA = $originalAppData
         $env:LOCALAPPDATA = $originalLocalAppData
+        if ($hadSSHConnection) {
+            $env:SSH_CONNECTION = $originalSSHConnection
+        } else {
+            Remove-Item Env:\SSH_CONNECTION -ErrorAction SilentlyContinue
+        }
     }
 }
 
