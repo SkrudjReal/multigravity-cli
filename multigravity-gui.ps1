@@ -171,8 +171,14 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                                Foreground="#8999BC" FontSize="12" Margin="0,0,0,22"/>
                     <Button x:Name="LaunchButton" Content="Launch Antigravity"
                             Style="{StaticResource AccentButton}" Margin="0,0,0,9"/>
+                    <CheckBox x:Name="IsolatedAuthCheck"
+                              Content="Independent login (experimental)"
+                              Foreground="#B6C4E6" Margin="0,3,0,7"/>
+                    <TextBlock Text="When enabled, login tokens may be stored in profile files instead of Windows Credential Manager."
+                               TextWrapping="Wrap" FontSize="11"
+                               Foreground="#91A1C2" Margin="0,0,0,11"/>
                     <Button x:Name="OpenFolderButton" Content="Open profile folder"
-                            Margin="0,0,0,22"/>
+                            Margin="0,0,0,16"/>
                     <TextBlock Text="RENAME PROFILE" Foreground="#A8B6DA"
                                FontWeight="SemiBold" Margin="0,0,0,8"/>
                     <TextBox x:Name="RenameInput" MaxLength="64"
@@ -316,7 +322,11 @@ function Launch-Selected {
     $item = Get-SelectedProfile
     if ($null -eq $item) { return }
     try {
-        [void](Invoke-Cli @($item.Name))
+        $launchArguments = @($item.Name)
+        if ($script:Window.FindName('IsolatedAuthCheck').IsChecked -eq $true) {
+            $launchArguments += '--isolated-auth'
+        }
+        [void](Invoke-Cli $launchArguments)
         $script:StatusText.Text = "Launch requested: $($item.Name)"
     } catch {
         Show-Error $_.Exception.Message
