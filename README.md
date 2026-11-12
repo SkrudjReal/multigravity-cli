@@ -85,48 +85,61 @@ Do not run `multigravity update` until this fork branch is merged.
 
 ---
 
-## Windows WPF Profile Manager (fork)
+## Windows WPF Profile Manager (Astral theme)
 
-The Windows WPF manager uses the same local profiles as the CLI: no migration
-and no reinstall of Antigravity are needed.
+This fork includes a WPF profile manager with an original purple-and-gold
+space-opera interface. It draws on the visual *language* of Honkai: Star Rail:
+deep amethyst surfaces, gold accents, gently animated controls and a subtle
+celestial glow. No HoYoverse artwork or assets are included.
 
-- Create, launch, rename, and delete full or shared profiles.
-- Use **Independent login** to opt into profile-local credential storage.
-  This relies on undocumented Antigravity behavior; see the security notes above.
-- Resize freely: the interface scrolls vertically and automatically switches
-  to a single-column layout on narrow windows.
-- The custom Multigravity icon is installed for the GUI window, taskbar and
-  the **Multigravity Profile Manager** Start Menu shortcut.
+- Shows existing full/shared Antigravity profiles; no account migration.
+- Create, launch, rename, and remove profiles using the existing CLI.
+- **Independent login** is an opt-in mode with documented credential-storage
+  caveats (see the section above). Its implementation is still undocumented.
+- Responsive panels stack in narrow windows, while scrolling keeps controls
+  reachable at small heights.
+- Buttons and checkboxes have custom muted WPF templates, including disabled
+  states; there are no white Windows-themed default buttons.
+- A gentle header entrance, star pulse and fast hover transitions enhance
+  feedback without distracting from work.
 
-Open from the Start Menu, or run:
+### Branded taskbar icon
 
-```powershell
-multigravity gui
-```
+The installer downloads a custom PNG, writes a Windows ICO and tries to build
+`MultigravityProfileManager.exe` using the .NET Framework C# compiler
+included with Windows. The tiny launcher runs the PowerShell WPF interface in
+its own process with a native executable icon. The Start Menu shortcut and
+`multigravity gui` prefer this executable when present.
 
-Install or upgrade the current fork branch from PowerShell 5.1:
+If the compiler is unavailable, the installer falls back to launching the
+PowerShell script; the script sets a dedicated AppUserModelID and a window icon.
+**An already-pinned PowerShell shortcut may need to be unpinned and replaced
+with the new Multigravity Profile Manager shortcut.**
+
+### Install this development branch
+
+From a fresh Windows PowerShell 5.1 terminal:
 
 ```powershell
 $env:MULTIGRAVITY_REPO = 'SkrudjReal/multigravity-cli'
-$env:MULTIGRAVITY_REF = 'fix/windows-independent-auth-profiles'
-irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/fix/windows-independent-auth-profiles/install.ps1 | iex
+$env:MULTIGRAVITY_REF = 'feature/astral-purple-wpf'
+irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/feature/astral-purple-wpf/install.ps1 | iex
 multigravity gui
 ```
 
-Requirements: Windows 10/11, Windows PowerShell 5.1, .NET Framework WPF.
-The installer is BOM-free for `irm | iex`; installed PowerShell scripts
-are saved with a UTF-8 BOM to work correctly with Windows PowerShell 5.1.
-A separate 64x64 PNG is downloaded as raw bytes, then wrapped as ICO for
-the Start Menu shortcut.
+Existing profile folders are not overwritten by the installer.
+`install.ps1` is BOM-free to work when piped into `iex`; the
+installed PowerShell scripts retain a UTF-8 BOM for PowerShell 5.1.
 
-Static syntax/XAML and Windows WPF load validation:
+### Validate on Windows
 
 ```powershell
 powershell.exe -NoProfile -File .\tests\Test-WindowsGui.ps1
 ```
 
-The old GUI was tested successfully on Windows. The responsive layout, icon
-installation, and new shortcut need a fresh Windows runtime check.
+A GitHub Actions Windows runner also performs PowerShell syntax and WPF XAML
+loading checks for this branch. Interactive resize, animation and two-account
+tests still need a local Windows verification.
 
 ---
 
