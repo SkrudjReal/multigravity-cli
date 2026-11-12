@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - feature/astral-purple-wpf
+      - feature/frosted-neon-effects
   pull_request:
   workflow_dispatch:
 
