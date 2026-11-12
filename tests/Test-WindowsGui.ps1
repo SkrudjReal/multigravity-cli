@@ -31,6 +31,12 @@ if (-not $match.Success) {
 if ($xaml.DocumentElement.LocalName -ne 'Window') {
     throw 'Root XAML element must be a Window.'
 }
+# WPF controls live in the presentation namespace; xaml without
+# /presentation parses as XML but fails to create Window at runtime.
+$presentationNamespace = 'http://schemas.microsoft.com/winfx/2006/xaml/presentation'
+if ($xaml.DocumentElement.NamespaceURI -ne $presentationNamespace) {
+    throw "Invalid root Window XAML namespace: $($xaml.DocumentElement.NamespaceURI)"
+}
 $namespaceManager = New-Object System.Xml.XmlNamespaceManager($xaml.NameTable)
 $namespaceManager.AddNamespace('x', 'http://schemas.microsoft.com/winfx/2006/xaml')
 foreach ($control in @('ProfileList', 'RefreshButton', 'CreateButton', 'LaunchButton',
