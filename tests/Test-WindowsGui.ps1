@@ -55,4 +55,61 @@ if (-not $source.Contains('x:Name="IsolatedAuthCheck"')) {
 }
 Write-Host 'PASS: isolation flags and opt-in auth control are present.'
 
-Write-Host 'NOTE: This is a static check, not a full Windows GUI runtime test.'
+# Regression checks for responsive layout and the custom icon.
+foreach ($expected in @('x:Name="ProfilesLayout"', 'x:Name="DetailsPanel"',
+                        'x:Name="HeaderLayout"', 'VerticalScrollBarVisibility="Auto"',
+                        'function Update-ResponsiveLayout', 'Add_SizeChanged',
+                        'multigravity-gui-icon.png')) {
+    if (-not $source.Contains($expected)) {
+        throw "Missing responsive layout or icon feature: $expected"
+    }
+}
+if ($source.Contains('Independent login (experimental)')) {
+    throw 'The outdated experimental UI label is still present.'
+}
+$iconPath = Join-Path $root 'assets\multigravity-gui-icon.png'
+if (-not (Test-Path -LiteralPath $iconPath)) {
+    throw 'Missing generated PNG app icon.'
+}
+$png = [System.IO.File]::ReadAllBytes($iconPath)
+$signature = [byte[]]@(137,80,78,71,13,10,26,10)
+for ($i = 0; $i -lt $signature.Length; $i++) {
+    if ($png[$i] -ne $signature[$i]) {
+        throw 'Custom icon has an invalid PNG signature.'
+    }
+}
+$installerSource = [System.IO.File]::ReadAllText(
+    (Join-Path $root 'install.ps1'), [System.Text.Encoding]::UTF8)
+if ($installerSource[0] -eq [char]0xFEFF) {
+    throw 'install.ps1 must not start with BOM when run by irm | iex.'
+}
+foreach ($expected in @('assets/multigravity-gui-icon.png',
+                        'multigravity-gui.ico', 'Multigravity Profile Manager.lnk')) {
+    if (-not $installerSource.Contains($expected)) {
+        throw "Installer is missing GUI asset or shortcut: $expected"
+    }
+}
+Write-Host 'PASS: responsive UI, icon asset, and installer integration.'
+
+# Also load the XAML using the real WPF runtime on Windows; XML parsing alone
+# cannot detect unsupported property values.
+if ($env:OS -eq 'Windows_NT') {
+    Add-Type -AssemblyName PresentationFramework
+    Add-Type -AssemblyName PresentationCore
+    Add-Type -AssemblyName WindowsBase
+    $reader = New-Object System.Xml.XmlNodeReader $xaml
+    $window = [Windows.Markup.XamlReader]::Load($reader)
+    try {
+        foreach ($name in @('ProfilesLayout', 'DetailsPanel', 'HeaderLayout',
+                            'RefreshButton', 'IsolatedAuthCheck')) {
+            if ($null -eq $window.FindName($name)) {
+                throw "WPF could not resolve named control: $name"
+            }
+        }
+        Write-Host 'PASS: WPF created the window and resolved responsive controls.'
+    } finally {
+        $window.Close()
+    }
+}
+Write-Host 'NOTE: Real interactive resize and multi-account tests are still required.'
+
