@@ -111,5 +111,42 @@ if ($env:OS -eq 'Windows_NT') {
         $window.Close()
     }
 }
-Write-Host 'NOTE: Real interactive resize and multi-account tests are still required.'
+# Visual-theme regression checks: the disabled button state must remain dark,
+# not fall back to the Windows default white control template.
+foreach ($fragment in @('x:Name="OrbitSpark"', 'Property="IsEnabled" Value="False"',
+                      'TargetName="Chrome" Property="Background" Value="#201A2C"',
+                      'Style x:Key="DangerButton"', 'DoubleAnimation',
+                      'Color="#0D0917"', 'Property="BorderBrush" Value="#AE81D5"')) {
+    if (-not $source.Contains($fragment)) {
+        throw "Missing astral UI theme or animation: $fragment"
+    }
+}
+foreach ($fragment in @('SetCurrentProcessExplicitAppUserModelID',
+                      'MultigravityTaskbar', 'SendMessage($hwnd, 0x80',
+                      'Add_ContentRendered')) {
+    if (-not $source.Contains($fragment)) {
+        throw "Missing branded taskbar or entrance behavior: $fragment"
+    }
+}
+$cliSource = [System.IO.File]::ReadAllText(
+    (Join-Path $root 'multigravity.ps1'), [System.Text.Encoding]::UTF8)
+if (-not $cliSource.Contains('MultigravityProfileManager.exe')) {
+    throw 'multigravity gui is not configured to launch the branded host.'
+}
+$launcherPath = Join-Path $root 'multigravity-gui-launcher.cs'
+if (-not (Test-Path -LiteralPath $launcherPath)) {
+    throw 'Missing native-icon C# GUI launcher source.'
+}
+$launcherSource = [System.IO.File]::ReadAllText($launcherPath, [System.Text.Encoding]::UTF8)
+if (-not $launcherSource.Contains('RunspaceFactory.CreateRunspace')) {
+    throw 'Native launcher does not host the PowerShell GUI script.'
+}
+foreach ($fragment in @('/target:winexe', '/win32icon:', 'multigravity-gui-launcher.cs')) {
+    if (-not $installerSource.Contains($fragment)) {
+        throw "Installer is missing native GUI compilation step: $fragment"
+    }
+}
+Write-Host 'PASS: branded taskbar identity, custom dark controls, and WPF motion present.'
+Write-Host 'NOTE: Windows resize, runtime animations, and login isolation still need an interactive test.'
+
 
