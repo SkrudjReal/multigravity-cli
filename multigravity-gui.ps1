@@ -276,7 +276,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
-                        <TextBlock Text="&#x2726;" Foreground="#C6A87D" FontSize="17" Margin="0,0,9,0"/>
+                        <TextBlock x:Name="OrbitSpark" Text="&#x2726;" Foreground="#C6A87D" FontSize="17" Margin="0,0,9,0"/>
                         <TextBlock Text="MULTIGRAVITY" Foreground="#C6A87D"
                                    FontSize="12" FontWeight="SemiBold"/>
                         <TextBlock Text="   /   PROFILE CONSTELLATION" Foreground="#867593"
@@ -535,6 +535,40 @@ function Update-ResponsiveLayout {
 }
 $script:Window.Add_SizeChanged({ Update-ResponsiveLayout })
 $script:Window.Add_Loaded({ Update-ResponsiveLayout })
+
+# Small entrance and star shimmer animations; intentionally no full-screen motion.
+$script:Window.Add_ContentRendered({
+    $header = $script:Window.FindName('HeaderLayout')
+    $header.Opacity = 0
+    $header.RenderTransform = [System.Windows.Media.TranslateTransform]::new(0, 9)
+
+    $fadeIn = New-Object System.Windows.Media.Animation.DoubleAnimation
+    $fadeIn.From = 0.0
+    $fadeIn.To = 1.0
+    $fadeIn.Duration = [System.Windows.Duration]::new([TimeSpan]::FromMilliseconds(360))
+    $header.BeginAnimation([System.Windows.UIElement]::OpacityProperty, $fadeIn)
+
+    $slideIn = New-Object System.Windows.Media.Animation.DoubleAnimation
+    $slideIn.From = 9.0
+    $slideIn.To = 0.0
+    $slideIn.Duration = [System.Windows.Duration]::new([TimeSpan]::FromMilliseconds(430))
+    $ease = New-Object System.Windows.Media.Animation.CubicEase
+    $ease.EasingMode = [System.Windows.Media.Animation.EasingMode]::EaseOut
+    $slideIn.EasingFunction = $ease
+    $header.RenderTransform.BeginAnimation([System.Windows.Media.TranslateTransform]::YProperty, $slideIn)
+
+    $spark = $script:Window.FindName('OrbitSpark')
+    if ($null -ne $spark) {
+        $twinkle = New-Object System.Windows.Media.Animation.DoubleAnimation
+        $twinkle.From = 0.45
+        $twinkle.To = 0.96
+        $twinkle.Duration = [System.Windows.Duration]::new([TimeSpan]::FromSeconds(2.8))
+        $twinkle.AutoReverse = $true
+        $twinkle.RepeatBehavior = [System.Windows.Media.Animation.RepeatBehavior]::Forever
+        $spark.BeginAnimation([System.Windows.UIElement]::OpacityProperty, $twinkle)
+    }
+})
+
 $script:Items = New-Object 'System.Collections.ObjectModel.ObservableCollection[Object]'
 $script:ProfileList.ItemsSource = $script:Items
 
