@@ -1,4 +1,4 @@
-﻿$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Stop"
 
 $REPO = if ($env:MULTIGRAVITY_REPO) { $env:MULTIGRAVITY_REPO } else { "SkrudjReal/multigravity-cli" }
 $BRANCH = if ($env:MULTIGRAVITY_REF) { $env:MULTIGRAVITY_REF } else { "main" }
@@ -66,7 +66,7 @@ powershell.exe -ExecutionPolicy Bypass -File "%~dp0multigravity.ps1" %*
 [System.IO.File]::WriteAllText("$INSTALL_DIR\multigravity.cmd", $wrapper, [System.Text.Encoding]::ASCII)
 
 Write-Host ""
-Write-Host "✓ Multigravity installed successfully!"
+Write-Host "Multigravity installed successfully!"
 Write-Host ""
 Write-Host "Usage:"
 Write-Host "  multigravity help"
