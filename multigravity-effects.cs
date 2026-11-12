@@ -180,7 +180,7 @@ namespace Multigravity {
             var leaf = new Path {
                 Width=size, Height=size, Stretch=Stretch.Fill, Data=PetalGeometry,
                 Fill=b, Effect=PetalGlow, IsHitTestVisible=false,
-                Opacity=burst?.98:.9,
+                Opacity=burst ? 0.98 : 0.9,
                 RenderTransformOrigin=new Point(.5,.5)
             };
             var transforms = new TransformGroup();
@@ -205,7 +205,7 @@ namespace Multigravity {
             var shrink = new DoubleAnimation { From=1,To=.4,Duration=duration,EasingFunction=Ease };
             scale.BeginAnimation(ScaleTransform.ScaleXProperty,shrink);
             scale.BeginAnimation(ScaleTransform.ScaleYProperty,shrink);
-            FadeRemove(leaf,seconds,burst?.98:.9);
+            FadeRemove(leaf,seconds,burst ? 0.98 : 0.9);
         }
         private void SpawnFlash(double x,double y) {
             var circle = new Ellipse {
