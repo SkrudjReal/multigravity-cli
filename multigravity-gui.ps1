@@ -296,12 +296,18 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
-                        <Border x:Name="RowChrome" CornerRadius="12"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="#373840" BorderThickness="1"
-                                Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
-                        </Border>
+                        <Grid>
+                            <Border x:Name="RowChrome" CornerRadius="12"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="#373840" BorderThickness="1"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                            </Border>
+                            <Border x:Name="SelectionNeon" Width="3" Height="35"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Background="#EC4791" CornerRadius="3" Opacity="0"
+                                    Margin="0,0,4,0" IsHitTestVisible="False"/>
+                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="RowChrome" Property="Background" Value="#30262F"/>
@@ -310,6 +316,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                             <Trigger Property="IsSelected" Value="True">
                                 <Setter TargetName="RowChrome" Property="Background" Value="#3C2B37"/>
                                 <Setter TargetName="RowChrome" Property="BorderBrush" Value="#F05BA2"/>
+                                <Setter TargetName="SelectionNeon" Property="Opacity" Value="0.92"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -326,16 +333,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                 <GradientStop Color="#101115" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
-        <Ellipse Width="560" Height="560" HorizontalAlignment="Right"
-                 VerticalAlignment="Top" Margin="0,-280,-170,0" Opacity="0.10"
-                 IsHitTestVisible="False" Fill="#A62F70">
-            <Ellipse.Effect><BlurEffect Radius="95"/></Ellipse.Effect>
-        </Ellipse>
-        <Ellipse Width="340" Height="340" HorizontalAlignment="Left"
-                 VerticalAlignment="Bottom" Margin="-140,0,0,-190" Opacity="0.08"
-                 IsHitTestVisible="False" Fill="#AC457C">
-            <Ellipse.Effect><BlurEffect Radius="70"/></Ellipse.Effect>
-        </Ellipse>
+        <!-- Animated low-opacity aurora layers come from FxSky. -->
         <Canvas IsHitTestVisible="False" Opacity="0.55" ClipToBounds="True">
             <Ellipse Canvas.Left="68" Canvas.Top="68" Width="3" Height="3" Fill="#CA9ED9"/>
             <Ellipse Canvas.Left="410" Canvas.Top="115" Width="2" Height="2" Fill="#D7BEC7"/>
@@ -741,6 +739,12 @@ function Sync-Selection {
         $script:SelectedType.Text = $selected.Type + ' profile'
         $script:SelectedPath.Text = $selected.Path
         $script:RenameInput.Text = $selected.Name
+        # A light identity fade on selection, without rebuilding the panel.
+        $script:SelectedName.BeginAnimation(
+            [System.Windows.UIElement]::OpacityProperty,
+            [System.Windows.Media.Animation.DoubleAnimation]::new(
+                [double]0.28, [double]1.0,
+                [System.Windows.Duration]::new([TimeSpan]::FromMilliseconds(210))))
     } else {
         $script:SelectedName.Text = 'Select a profile'
         $script:SelectedType.Text = 'No profile selected'
