@@ -40,7 +40,7 @@ if (!$IN_PATH) {
 
 # Download raw bytes and write UTF-8 with BOM for Windows PowerShell 5.1.
 $UTF8BOM = New-Object System.Text.UTF8Encoding($true)
-foreach ($name in @("multigravity.ps1", "multigravity-gui.ps1", "multigravity-gui-launcher.cs")) {
+foreach ($name in @("multigravity.ps1", "multigravity-gui.ps1", "multigravity-gui-launcher.cs", "multigravity-effects.cs")) {
     Write-Step "Downloading $name..."
     $tempFile = Join-Path $INSTALL_DIR ($name + ".download")
     try {
