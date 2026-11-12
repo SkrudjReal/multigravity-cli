@@ -48,7 +48,7 @@ multigravity agy --isolated-auth
 multigravity op-agy --isolated-auth
 ```
 
-Or check **Independent login (experimental)** before launching from the WPF GUI.
+Or check **Independent login** before launching from the WPF GUI.
 Close all existing Antigravity windows before the first test; then start each
 profile and explicitly select a different Google account in the browser.
 
@@ -80,53 +80,53 @@ multigravity gui
 ```
 
 Existing profile folders are retained; the installer replaces only the CLI
-scripts under `~.localin`. For the first test, back up important data.
+scripts under `~/.local/bin`. For the first test, back up important data.
 Do not run `multigravity update` until this fork branch is merged.
 
 ---
 
 ## Windows WPF Profile Manager (fork)
 
-The Windows version includes an optional dark-themed WPF interface for managing
-existing Multigravity profiles. It uses the same profile directories and CLI,
-so no account migration is needed.
+The Windows WPF manager uses the same local profiles as the CLI: no migration
+and no reinstall of Antigravity are needed.
 
-- View, launch (including double-click), create and rename profiles.
-- Choose full or shared profiles when creating a new one.
-- Open a profile's folder and delete profiles with a confirmation prompt.
-- Refresh the list after changes made outside the GUI.
+- Create, launch, rename, and delete full or shared profiles.
+- Use **Independent login** to opt into profile-local credential storage.
+  This relies on undocumented Antigravity behavior; see the security notes above.
+- Resize freely: the interface scrolls vertically and automatically switches
+  to a single-column layout on narrow windows.
+- The custom Multigravity icon is installed for the GUI window, taskbar and
+  the **Multigravity Profile Manager** Start Menu shortcut.
 
-Launch the GUI with:
+Open from the Start Menu, or run:
 
 ```powershell
 multigravity gui
 ```
 
-Requirements: Windows 10/11 with Windows PowerShell 5.1 and .NET Framework WPF.
-The GUI is bundled with the Windows installer as `multigravity-gui.ps1`.
-The GUI does **not** reliably identify all running Antigravity instances:
-Windows process command lines do not necessarily include a profile name.
-
-To try the development branch before it is merged into this fork's main branch:
+Install or upgrade the current fork branch from PowerShell 5.1:
 
 ```powershell
 $env:MULTIGRAVITY_REPO = 'SkrudjReal/multigravity-cli'
-$env:MULTIGRAVITY_REF = 'feature/windows-wpf-profile-manager'
-irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/feature/windows-wpf-profile-manager/install.ps1 | iex
+$env:MULTIGRAVITY_REF = 'fix/windows-independent-auth-profiles'
+irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/fix/windows-independent-auth-profiles/install.ps1 | iex
 multigravity gui
 ```
 
-The Windows installer stores both PowerShell scripts as UTF-8 with BOM, which is
-important for PowerShell 5.1.
+Requirements: Windows 10/11, Windows PowerShell 5.1, .NET Framework WPF.
+The installer is BOM-free for `irm | iex`; installed PowerShell scripts
+are saved with a UTF-8 BOM to work correctly with Windows PowerShell 5.1.
+A separate 64x64 PNG is downloaded as raw bytes, then wrapped as ICO for
+the Start Menu shortcut.
 
-Static syntax/XAML verification on Windows:
+Static syntax/XAML and Windows WPF load validation:
 
 ```powershell
 powershell.exe -NoProfile -File .\tests\Test-WindowsGui.ps1
 ```
 
-The WPF interface has not yet been runtime-tested in this environment. Keep the experimental `MULTIGRAVITY_REF`
-environment variable set if reinstalling from this branch.
+The old GUI was tested successfully on Windows. The responsive layout, icon
+installation, and new shortcut need a fresh Windows runtime check.
 
 ---
 
