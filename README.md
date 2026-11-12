@@ -61,7 +61,15 @@ multigravity gui
 ```
 
 The Windows installer stores both PowerShell scripts as UTF-8 with BOM, which is
-important for PowerShell 5.1. Keep the experimental `MULTIGRAVITY_REF`
+important for PowerShell 5.1.
+
+Static syntax/XAML verification on Windows:
+
+```powershell
+powershell.exe -NoProfile -File .\tests\Test-WindowsGui.ps1
+```
+
+The WPF interface has not yet been runtime-tested in this environment. Keep the experimental `MULTIGRAVITY_REF`
 environment variable set if reinstalling from this branch.
 
 ---
