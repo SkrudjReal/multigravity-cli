@@ -534,7 +534,7 @@ $script:Window = [Windows.Markup.XamlReader]::Load($reader)
 $script:FxSky = $script:Window.FindName('FxSky')
 $script:FxSparks = $script:Window.FindName('FxSparks')
 $effectsFile = Join-Path $PSScriptRoot 'multigravity-effects.cs'
-if (Test-Path -LiteralPath $effectsFile) {
+if ((Test-Path -LiteralPath $effectsFile) -and ($env:MULTIGRAVITY_DISABLE_FX -ne '1')) {
     try {
         if (-not ('Multigravity.FrostEffects' -as [type])) {
             $references = @(
