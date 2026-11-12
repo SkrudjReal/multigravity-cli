@@ -449,7 +449,7 @@ if (Test-Path -LiteralPath $iconPath) {
     $iconStream = $null
     try {
         $iconBytes = [System.IO.File]::ReadAllBytes($iconPath)
-        $iconStream = New-Object System.IO.MemoryStream (,$iconBytes)
+        $iconStream = [System.IO.MemoryStream]::new($iconBytes)
         $bitmap = New-Object System.Windows.Media.Imaging.BitmapImage
         $bitmap.BeginInit()
         $bitmap.CacheOption = [System.Windows.Media.Imaging.BitmapCacheOption]::OnLoad
@@ -469,9 +469,9 @@ if (Test-Path -LiteralPath $iconPath) {
 $nativeIconPath = Join-Path $PSScriptRoot 'multigravity-gui.ico'
 if (Test-Path -LiteralPath $nativeIconPath) {
     try {
-        $script:NativeIcon = New-Object System.Drawing.Icon($nativeIconPath)
+        $script:NativeIcon = [System.Drawing.Icon]::new($nativeIconPath)
         $script:Window.Add_SourceInitialized({
-            $helper = New-Object System.Windows.Interop.WindowInteropHelper($script:Window)
+            $helper = [System.Windows.Interop.WindowInteropHelper]::new($script:Window)
             $hwnd = $helper.Handle
             if ($hwnd -ne [IntPtr]::Zero) {
                 [void][MultigravityTaskbar]::SendMessage($hwnd, 0x80, [IntPtr]1, $script:NativeIcon.Handle)
