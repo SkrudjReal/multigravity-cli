@@ -59,9 +59,9 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
         <SolidColorBrush x:Key="Gold" Color="#E95B9C"/>
         <SolidColorBrush x:Key="Muted" Color="#A2A2AE"/>
         <Style TargetType="Button">
-            <Setter Property="Background" Value="#29203B"/>
-            <Setter Property="Foreground" Value="#E2D8ED"/>
-            <Setter Property="BorderBrush" Value="#57416C"/>
+            <Setter Property="Background" Value="#25262B"/>
+            <Setter Property="Foreground" Value="#E7E8EC"/>
+            <Setter Property="BorderBrush" Value="#3B3E49"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Padding" Value="18,11"/>
@@ -86,10 +86,10 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                                     CornerRadius="2" Opacity="0.22" IsHitTestVisible="False">
                                 <Border.Background>
                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Color="#00DBE5EE" Offset="0"/>
+                                        <GradientStop Color="#00DDEAF1" Offset="0"/>
                                         <GradientStop Color="#80DBE5EE" Offset="0.25"/>
                                         <GradientStop Color="#39FFD5E8" Offset="0.65"/>
-                                        <GradientStop Color="#00DBE5EE" Offset="1"/>
+                                        <GradientStop Color="#00DDEAF1" Offset="1"/>
                                     </LinearGradientBrush>
                                 </Border.Background>
                             </Border>
@@ -106,13 +106,13 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#AE81D5"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#DF6DA9"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="#4A305F"/>
+                                <Setter TargetName="Chrome" Property="Background" Value="#492C3F"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Chrome" Property="Background" Value="#201A2C"/>
+                                <Setter TargetName="Chrome" Property="Background" Value="#1D1E23"/>
                                 <Setter TargetName="Chrome" Property="BorderBrush" Value="#33343C"/>
                                 <Setter TargetName="FrostRim" Property="Opacity" Value="0.06"/>
                                 <Setter Property="Foreground" Value="#777983"/>
@@ -163,21 +163,21 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             </Style.Triggers>
         </Style>
         <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#55346F"/>
-            <Setter Property="BorderBrush" Value="#9667BB"/>
-            <Setter Property="Foreground" Value="#F0E3FC"/>
+            <Setter Property="Background" Value="#54283E"/>
+            <Setter Property="BorderBrush" Value="#C74D8A"/>
+            <Setter Property="Foreground" Value="#FBE5F0"/>
         </Style>
         <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="#372332"/>
-            <Setter Property="BorderBrush" Value="#6E435C"/>
-            <Setter Property="Foreground" Value="#E6B4C8"/>
+            <Setter Property="Background" Value="#30272D"/>
+            <Setter Property="BorderBrush" Value="#65444E"/>
+            <Setter Property="Foreground" Value="#EBB4C8"/>
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#191326"/>
-            <Setter Property="Foreground" Value="#E2D8ED"/>
-            <Setter Property="CaretBrush" Value="#D7AFFF"/>
-            <Setter Property="SelectionBrush" Value="#71428C"/>
-            <Setter Property="BorderBrush" Value="#57416C"/>
+            <Setter Property="Background" Value="#1A1C21"/>
+            <Setter Property="Foreground" Value="#E7E8EC"/>
+            <Setter Property="CaretBrush" Value="#FF7AB8"/>
+            <Setter Property="SelectionBrush" Value="#68334E"/>
+            <Setter Property="BorderBrush" Value="#3B3E49"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="11,9"/>
             <Setter Property="MinHeight" Value="39"/>
@@ -193,7 +193,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocusWithin" Value="True">
-                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#AE81D5"/>
+                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#DF6DA9"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -201,7 +201,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             </Setter>
         </Style>
         <Style TargetType="CheckBox">
-            <Setter Property="Foreground" Value="#C8BBD5"/>
+            <Setter Property="Foreground" Value="#C8C9D1"/>
             <Setter Property="VerticalAlignment" Value="Center"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Template">
@@ -210,10 +210,10 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <Border x:Name="BoxChrome" Width="17" Height="17"
                                     CornerRadius="4" BorderThickness="1"
-                                    BorderBrush="#58445A" Background="#24182F"
+                                    BorderBrush="#58445A" Background="#25252C"
                                     VerticalAlignment="Center">
                                 <Path x:Name="Tick" Data="M 3,8 L 7,12 L 14,4"
-                                      Stroke="#EBD6FF" StrokeThickness="2"
+                                      Stroke="#FFE8F1" StrokeThickness="2"
                                       StrokeStartLineCap="Round" StrokeEndLineCap="Round"
                                       Visibility="Collapsed"/>
                             </Border>
@@ -223,11 +223,11 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
-                                <Setter TargetName="BoxChrome" Property="Background" Value="#69438A"/>
-                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#C5A1E1"/>
+                                <Setter TargetName="BoxChrome" Property="Background" Value="#753456"/>
+                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#E974AE"/>
                             </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#C4A3DC"/>
+                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#FF9AC6"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter Property="Opacity" Value="0.48"/>
@@ -287,8 +287,8 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             </Setter>
         </Style>
         <Style TargetType="ListBoxItem">
-            <Setter Property="Background" Value="#23182F"/>
-            <Setter Property="Foreground" Value="#E2D8ED"/>
+            <Setter Property="Background" Value="#232429"/>
+            <Setter Property="Foreground" Value="#E7E8EC"/>
             <Setter Property="Margin" Value="0,0,0,9"/>
             <Setter Property="Padding" Value="12"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
@@ -304,12 +304,12 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="RowChrome" Property="Background" Value="#32213E"/>
-                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#9D72B4"/>
+                                <Setter TargetName="RowChrome" Property="Background" Value="#30262F"/>
+                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#D75599"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="RowChrome" Property="Background" Value="#422654"/>
-                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#BA90D1"/>
+                                <Setter TargetName="RowChrome" Property="Background" Value="#3C2B37"/>
+                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#F05BA2"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -328,17 +328,17 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
         </Grid.Background>
         <Ellipse Width="560" Height="560" HorizontalAlignment="Right"
                  VerticalAlignment="Top" Margin="0,-280,-170,0" Opacity="0.10"
-                 IsHitTestVisible="False" Fill="#7F419A">
+                 IsHitTestVisible="False" Fill="#A62F70">
             <Ellipse.Effect><BlurEffect Radius="95"/></Ellipse.Effect>
         </Ellipse>
         <Ellipse Width="340" Height="340" HorizontalAlignment="Left"
                  VerticalAlignment="Bottom" Margin="-140,0,0,-190" Opacity="0.08"
-                 IsHitTestVisible="False" Fill="#9E549C">
+                 IsHitTestVisible="False" Fill="#AC457C">
             <Ellipse.Effect><BlurEffect Radius="70"/></Ellipse.Effect>
         </Ellipse>
         <Canvas IsHitTestVisible="False" Opacity="0.55" ClipToBounds="True">
             <Ellipse Canvas.Left="68" Canvas.Top="68" Width="3" Height="3" Fill="#CA9ED9"/>
-            <Ellipse Canvas.Left="410" Canvas.Top="115" Width="2" Height="2" Fill="#E5CFAB"/>
+            <Ellipse Canvas.Left="410" Canvas.Top="115" Width="2" Height="2" Fill="#D7BEC7"/>
             <Ellipse Canvas.Left="925" Canvas.Top="83" Width="3" Height="3" Fill="#9B80BC"/>
             <Ellipse Canvas.Left="740" Canvas.Top="273" Width="2" Height="2" Fill="#C6A8D6"/>
             <Ellipse Canvas.Left="160" Canvas.Top="405" Width="2" Height="2" Fill="#A893C1"/>
@@ -363,8 +363,8 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
-                        <TextBlock x:Name="OrbitSpark" Text="&#x2726;" Foreground="#E69CBD" FontSize="17" Margin="0,0,9,0"/>
-                        <TextBlock Text="MULTIGRAVITY" Foreground="#E69CBD"
+                        <TextBlock x:Name="OrbitSpark" Text="&#x2726;" Foreground="#EE7FAF" FontSize="17" Margin="0,0,9,0"/>
+                        <TextBlock Text="MULTIGRAVITY" Foreground="#EE7FAF"
                                    FontSize="12" FontWeight="SemiBold"/>
                         <TextBlock Text="   /   PROFILE CONSTELLATION" Foreground="#867593"
                                    FontSize="11" VerticalAlignment="Center"/>
@@ -405,13 +405,13 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                             <Grid Grid.Row="0">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#x2726;" Foreground="#E69CBD"
+                                    <TextBlock Text="&#x2726;" Foreground="#EE7FAF"
                                                Margin="0,0,8,0" FontSize="13"/>
                                     <TextBlock Text="YOUR PROFILES" Foreground="#D6D6DC"
                                                FontWeight="SemiBold" FontSize="12"/>
                                 </StackPanel>
                                 <TextBlock x:Name="CountText" Grid.Column="1"
-                                           Text="0 profiles" Foreground="#A693B8" FontSize="12"/>
+                                           Text="0 profiles" Foreground="#B1ABB4" FontSize="12"/>
                             </Grid>
                             <ListBox x:Name="ProfileList" Grid.Row="2"
                                      Background="Transparent" BorderThickness="0"
@@ -436,13 +436,13 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                                             <StackPanel Grid.Column="1">
                                                 <TextBlock Text="{Binding Name}" Foreground="#E6DBEF"
                                                            FontSize="15" FontWeight="SemiBold"/>
-                                                <TextBlock Text="{Binding LastModified}" Foreground="#A194AE"
+                                                <TextBlock Text="{Binding LastModified}" Foreground="#92939D"
                                                            FontSize="10.5" Margin="0,4,0,0"/>
                                             </StackPanel>
-                                            <Border Grid.Column="2" BorderBrush="#594360"
-                                                    BorderThickness="1" Background="#2F203B"
+                                            <Border Grid.Column="2" BorderBrush="#51414D"
+                                                    BorderThickness="1" Background="#2D252D"
                                                     CornerRadius="7" Padding="7,3" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Type}" Foreground="#BFA7D1"
+                                                <TextBlock Text="{Binding Type}" Foreground="#CEB2C1"
                                                            FontSize="10.5"/>
                                             </Border>
                                         </Grid>
@@ -452,7 +452,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                             <StackPanel Grid.Row="4">
                                 <Border Background="#644A6C" Height="1" Opacity="0.4"
                                         Margin="0,0,0,17"/>
-                                <TextBlock Text="CREATE NEW PROFILE" Foreground="#CBB2D8"
+                                <TextBlock Text="CREATE NEW PROFILE" Foreground="#D2CCD5"
                                            FontWeight="SemiBold" FontSize="11" Margin="0,0,0,10"/>
                                 <TextBox x:Name="NewNameInput" MaxLength="64"/>
                                 <WrapPanel Margin="0,12,0,0">
@@ -470,7 +470,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                             Background="#E31B1C22" CornerRadius="18" Padding="22">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <TextBlock Text="&#x2726;" Foreground="#E69CBD"
+                                <TextBlock Text="&#x2726;" Foreground="#EE7FAF"
                                            FontSize="13" Margin="0,0,8,0"/>
                                 <TextBlock Text="SELECTED IDENTITY" Foreground="#D6D6DC"
                                            FontWeight="SemiBold" FontSize="12"/>
@@ -479,22 +479,22 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                                        TextWrapping="Wrap" Foreground="#F0EFF2"
                                        FontWeight="SemiBold" FontSize="26" Margin="0,5,0,6"/>
                             <TextBlock x:Name="SelectedType" Text="No profile selected"
-                                       Foreground="#BD9CC9" FontSize="12"/>
+                                       Foreground="#C5ADBB" FontSize="12"/>
                             <TextBlock x:Name="SelectedPath" TextWrapping="Wrap"
-                                       Foreground="#8E81A3" FontSize="11"
+                                       Foreground="#91939E" FontSize="11"
                                        Margin="0,12,0,18"/>
                             <Button x:Name="LaunchButton" Content="&#x2726;  Launch Antigravity"
                                     Style="{StaticResource AccentButton}" Margin="0,0,0,12"/>
                             <CheckBox x:Name="IsolatedAuthCheck" Content="Independent login" IsChecked="True"
                                       Margin="0,0,0,7"/>
                             <TextBlock Text="Store sign-in files separately for this profile. Keep profile folders private."
-                                       Foreground="#9786A8" TextWrapping="Wrap"
+                                       Foreground="#9B96A0" TextWrapping="Wrap"
                                        FontSize="11" Margin="0,0,0,14"/>
                             <Button x:Name="OpenFolderButton" Content="Open profile folder"
                                     Margin="0,0,0,18"/>
                             <Border Background="#644A6C" Height="1" Opacity="0.4"
                                     Margin="0,0,0,17"/>
-                            <TextBlock Text="RENAME PROFILE" Foreground="#CBB2D8"
+                            <TextBlock Text="RENAME PROFILE" Foreground="#D2CCD5"
                                        FontSize="11" FontWeight="SemiBold" Margin="0,0,0,10"/>
                             <TextBox x:Name="RenameInput" MaxLength="64" Margin="0,0,0,13"/>
                             <WrapPanel Margin="0,0,0,13">
@@ -505,7 +505,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                                         MinWidth="133" Margin="0,0,0,8"/>
                             </WrapPanel>
                             <TextBlock Text="Deletion permanently removes this profile and its local settings."
-                                       TextWrapping="Wrap" Foreground="#857790" FontSize="11"/>
+                                       TextWrapping="Wrap" Foreground="#878892" FontSize="11"/>
                         </StackPanel>
                     </Border>
                 </Grid>
@@ -516,7 +516,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="StatusText" Text="Ready."
-                           Foreground="#B7A5CB" FontSize="11"
+                           Foreground="#BFC1C8" FontSize="11"
                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
                 <TextBlock Grid.Column="1" Text="&#x2726;   FROST / NEON"
                            Foreground="#92949E" FontSize="10" Margin="12,0,0,0"
