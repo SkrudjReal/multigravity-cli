@@ -121,6 +121,7 @@ if ($env:OS -eq 'Windows_NT') {
     Add-Type -AssemblyName PresentationFramework
     Add-Type -AssemblyName PresentationCore
     Add-Type -AssemblyName WindowsBase
+    Add-Type -AssemblyName System.Xaml
     $reader = New-Object System.Xml.XmlNodeReader $xaml
     $window = [Windows.Markup.XamlReader]::Load($reader)
     try {
@@ -191,6 +192,9 @@ if (-not $source.Contains('TextOptions.TextRenderingMode="ClearType"')) {
 if (-not $source.Contains('FontFamily="Segoe UI Variable Text, Segoe UI"')) {
     throw 'Expected friendly, legible Windows typography.'
 }
+if (-not $source.Contains('[System.Xaml.XamlObjectWriter].Assembly.Location')) {
+    throw 'Particle engine compilation must reference System.Xaml for IQueryAmbient.'
+}
 if (-not $source.Contains('x:Key="FrostThumb"')) {
     throw 'Custom scrollbar thumb style missing.'
 }
@@ -223,7 +227,8 @@ if ($env:OS -eq 'Windows_NT') {
         [System.Windows.Window].Assembly.Location,
         [System.Windows.Media.Brush].Assembly.Location,
         [System.Windows.DependencyObject].Assembly.Location,
-        [System.Windows.Controls.Canvas].Assembly.Location
+        [System.Windows.Controls.Canvas].Assembly.Location,
+        [System.Xaml.XamlObjectWriter].Assembly.Location
     ) | Select-Object -Unique
     Add-Type -Path $effectsPath -ReferencedAssemblies $references -ErrorAction Stop
     $reader = New-Object System.Xml.XmlNodeReader $xaml
