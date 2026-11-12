@@ -108,6 +108,8 @@ cursor glitter trail. It is built on native WPF, not Electron or a browser.
 The animation implementation lives in `multigravity-effects.cs` and is
 compiled locally by Windows PowerShell's built-in .NET Framework compiler.
 If compilation fails, the profile manager still opens without particle effects.
+For a low-motion / low-power session, set `MULTIGRAVITY_DISABLE_FX=1`
+before running `multigravity gui`; profile management remains unchanged.
 
 ### Install this experimental branch
 
