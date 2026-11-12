@@ -29,6 +29,43 @@ irm https://raw.githubusercontent.com/sujitagarwal/multigravity-cli/main/install
 
 ---
 
+## Windows WPF Profile Manager (fork)
+
+The Windows version includes an optional dark-themed WPF interface for managing
+existing Multigravity profiles. It uses the same profile directories and CLI,
+so no account migration is needed.
+
+- View, launch (including double-click), create and rename profiles.
+- Choose full or shared profiles when creating a new one.
+- Open a profile's folder and delete profiles with a confirmation prompt.
+- Refresh the list after changes made outside the GUI.
+
+Launch the GUI with:
+
+```powershell
+multigravity gui
+```
+
+Requirements: Windows 10/11 with Windows PowerShell 5.1 and .NET Framework WPF.
+The GUI is bundled with the Windows installer as `multigravity-gui.ps1`.
+The GUI does **not** reliably identify all running Antigravity instances:
+Windows process command lines do not necessarily include a profile name.
+
+To try the development branch before it is merged into this fork's main branch:
+
+```powershell
+$env:MULTIGRAVITY_REPO = 'SkrudjReal/multigravity-cli'
+$env:MULTIGRAVITY_REF = 'feature/windows-wpf-profile-manager'
+irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/feature/windows-wpf-profile-manager/install.ps1 | iex
+multigravity gui
+```
+
+The Windows installer stores both PowerShell scripts as UTF-8 with BOM, which is
+important for PowerShell 5.1. Keep the experimental `MULTIGRAVITY_REF`
+environment variable set if reinstalling from this branch.
+
+---
+
 ## Quick Start
 
 ```bash
@@ -66,6 +103,7 @@ Each profile gets an automatic clickable launcher:
 | `multigravity new <name> --from <template>` | Create a profile from a saved template |
 | `multigravity <name>` | Launch a profile |
 | `multigravity list` | List all profiles |
+| `multigravity gui` | Open the Windows WPF profile manager |
 | `multigravity status` | Show running state, type, last used, and size per profile |
 | `multigravity clone <src> <dest>` | Copy an existing profile |
 | `multigravity rename <old> <new>` | Rename a profile |
