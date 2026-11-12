@@ -669,16 +669,21 @@ switch ($cmd) {
         Invoke-ListProfiles
     }
     "gui" {
-        $guiPath = Join-Path $PSScriptRoot 'multigravity-gui.ps1'
-        if (!(Test-Path -LiteralPath $guiPath)) {
-            Write-Error "WPF GUI not installed. Place multigravity-gui.ps1 next to multigravity.ps1."
-            exit 1
-        }
-        if ([System.Threading.Thread]::CurrentThread.GetApartmentState() -ne [System.Threading.ApartmentState]::STA) {
-            $arguments = '-NoProfile -STA -ExecutionPolicy Bypass -File "' + $guiPath + '"'
-            Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments
+        $guiExe = Join-Path $PSScriptRoot 'MultigravityProfileManager.exe'
+        if (Test-Path -LiteralPath $guiExe) {
+            Start-Process -FilePath $guiExe
         } else {
-            & $guiPath
+            $guiPath = Join-Path $PSScriptRoot 'multigravity-gui.ps1'
+            if (!(Test-Path -LiteralPath $guiPath)) {
+                Write-Error "WPF GUI not installed. Re-run the Windows installer."
+                exit 1
+            }
+            if ([System.Threading.Thread]::CurrentThread.GetApartmentState() -ne [System.Threading.ApartmentState]::STA) {
+                $arguments = '-NoProfile -STA -ExecutionPolicy Bypass -File "' + $guiPath + '"'
+                Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments
+            } else {
+                & $guiPath
+            }
         }
     }
     "status" {
