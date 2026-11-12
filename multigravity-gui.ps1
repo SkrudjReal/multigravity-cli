@@ -47,7 +47,7 @@ $script:ProfilesRoot = if ($env:MULTIGRAVITY_HOME) {
 $script:PSExe = Join-Path $PSHOME 'powershell.exe'
 
 [xml]$xaml = @'
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Multigravity | Profile Manager"
         Width="1060" Height="740" MinWidth="460" MinHeight="420"
