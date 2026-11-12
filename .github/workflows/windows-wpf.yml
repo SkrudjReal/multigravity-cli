@@ -1,0 +1,16 @@
+name: Windows WPF GUI checks
+on:
+  push:
+    branches:
+      - feature/astral-purple-wpf
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate-wpf:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate PowerShell 5.1 syntax and WPF XAML
+        shell: powershell
+        run: .\tests\Test-WindowsGui.ps1
