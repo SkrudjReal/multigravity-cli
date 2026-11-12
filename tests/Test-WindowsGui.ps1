@@ -41,4 +41,18 @@ foreach ($control in @('ProfileList', 'RefreshButton', 'CreateButton', 'LaunchBu
     }
 }
 Write-Host 'PASS: embedded XAML parses and all required controls exist.'
+$cliSource = [System.IO.File]::ReadAllText(
+    (Join-Path $root 'multigravity.ps1'),
+    [System.Text.Encoding]::UTF8)
+foreach ($expected in @('--user-data-dir=', '--extensions-dir=', '--isolated-auth',
+                       'SSH_CONNECTION', 'finally {')) {
+    if (-not $cliSource.Contains($expected)) {
+        throw "Missing expected isolation launcher feature: $expected"
+    }
+}
+if (-not $source.Contains('x:Name="IsolatedAuthCheck"')) {
+    throw 'Missing explicit opt-in to file-based authentication in the GUI.'
+}
+Write-Host 'PASS: isolation flags and opt-in auth control are present.'
+
 Write-Host 'NOTE: This is a static check, not a full Windows GUI runtime test.'
