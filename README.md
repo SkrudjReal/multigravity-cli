@@ -29,6 +29,62 @@ irm https://raw.githubusercontent.com/sujitagarwal/multigravity-cli/main/install
 
 ---
 
+## Windows: independent Antigravity logins (experimental)
+
+**Why two regular profiles may still show the same Google account:** Windows
+Antigravity can read OAuth credentials from a *single* Windows Credential Manager
+entry named `gemini:antigravity`. Creating separate profile folders does not
+isolate that system credential.
+
+Windows profile launches now pass an explicit `--user-data-dir` and
+`--extensions-dir` to reduce Electron instance reuse and ensure separate
+local IDE state. However, the system keyring can still share a login between
+multiple profiles.
+
+For profile-local file-based auth **opt in per launch**:
+
+```powershell
+multigravity agy --isolated-auth
+multigravity op-agy --isolated-auth
+```
+
+Or check **Independent login (experimental)** before launching from the WPF GUI.
+Close all existing Antigravity windows before the first test; then start each
+profile and explicitly select a different Google account in the browser.
+
+**Security and compatibility caveats:**
+
+- This sets an `SSH_CONNECTION` marker **only in the launched process**.
+  Antigravity currently may treat it as a remote session and use a
+  profile-local file-based token store instead of Windows Credential Manager.
+  This is undocumented behavior and could stop working after an update.
+- Profile-local OAuth token files may have weaker protection than Windows
+  Credential Manager. Protect your Windows account and the directories under
+  `AntigravityProfiles`; never upload these profiles to a public repository.
+- The GUI toggle is session-scoped, not a persistent setting.
+- This does not migrate old logins or copy credentials. Log in again in each
+  isolated profile. The original global Windows credential is not erased.
+- Confirm account identity **inside each Antigravity window**, and again after
+  closing and relaunching each profile. If both still show the same login,
+  the installed Antigravity build is ignoring the file-token workaround.
+  In that case, separate Windows user accounts are the reliable isolation
+  boundary. Do not assume the fix worked merely because two windows opened.
+
+Test this branch of the fork without touching `main`:
+
+```powershell
+$env:MULTIGRAVITY_REPO = 'SkrudjReal/multigravity-cli'
+$env:MULTIGRAVITY_REF = 'fix/windows-independent-auth-profiles'
+irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/fix/windows-independent-auth-profiles/install.ps1 | iex
+multigravity gui
+```
+
+Existing profile folders are retained; the installer replaces only the CLI
+scripts under `~.localin`. For the first test, back up important data.
+Do not run `multigravity update` until this fork branch is merged.
+
+---
+
 ## Windows WPF Profile Manager (fork)
 
 The Windows version includes an optional dark-themed WPF interface for managing
