@@ -85,58 +85,69 @@ Do not run `multigravity update` until this fork branch is merged.
 
 ---
 
-## Windows WPF Profile Manager (Frost / Neon)
+## Windows WPF Profile Manager (Glass / Sakura)
 
-This branch adds a graphite-and-magenta Windows profile manager with a soft
-moving backdrop, airborne frosted dust, glowing click sparkles and a short
-cursor glitter trail. It is built on native WPF, not Electron or a browser.
+This branch combines the charcoal-and-neon glass profile UI with the **same
+micro-sakura cursor motion** used in the author's
+[‌aura-companion-plus CursorTrail.tsx](https://github.com/SkrudjReal/aura-companion-plus/blob/main/src/components/CursorTrail.tsx).
 
-- **Independent login** is checked by default. This still uses an undocumented
-  file-backed credential workaround; profile token files must stay private.
-  Untick the option to use the Windows Credential Manager path.
-- Modern **Segoe UI Variable Text** typography with ClearType rendering.
-- Dark charcoal panels, soft neon-pink accents on selection and hover,
-  hand-tuned dark/disabled buttons, and a subtle frost highlight at button edges.
-- Custom thin rounded scrollbar that turns pink when hovered/dragged.
-- Gentle header fade/slide and selected-profile fade, plus low-amplitude
-  glowing background movement.
-- 23 slow snow/dust particles behind content, a 34 ms cursor-trail throttle,
-  and small click bursts. Transient particles are capped at **55**.
-  The canvas cannot intercept clicks; the particle engine releases all elements
-  when the window closes.
+### Glass interface
 
-The animation implementation lives in `multigravity-effects.cs` and is
-compiled locally by Windows PowerShell's built-in .NET Framework compiler.
-If compilation fails, the profile manager still opens without particle effects.
-For a low-motion / low-power session, set `MULTIGRAVITY_DISABLE_FX=1`
-before running `multigravity gui`; profile management remains unchanged.
+- Dark pill-shaped buttons and profile rows with a soft satin reflection.
+- Pink **radial gradient occupying the rightmost 25%** of each pill.
+- Active profiles show a subtle diffuse pink ambient shadow and a slender
+  neon accent at the right edge.
+- Button hover adds a diffused magenta halo; high-contrast text stays above
+  the glass effect.
+- Frosted highlights, rounded charcoal scrollbar, low-opacity moving backdrop.
+- **Independent login** remains enabled by default; it relies on an
+  undocumented file-backed authentication workaround and should not be
+  considered hardened token isolation. Protect profile directories.
 
-### Install this experimental branch
+### Cursor effects (port from AURA)
 
-Open a new Windows PowerShell 5.1 window:
+The original React trail is in `src/components/CursorTrail.tsx`:
+- Spawn a micro-petal every **32ms** while moving.
+- **6-12 px** glossy pink sakura petals drift **-15 to +15 px** horizontally
+  and **10-30 px** downward.
+- Each petal rotates **180 degrees**, scales down to **40%**, and fades over
+  **700ms** with ease-out. A faint pink halo surrounds each petal.
+
+The WPF code in `multigravity-effects.cs` ports those specific
+parameters, geometry and timing. The additional click effect is a short
+circular pink glow surrounded by 10 drifting petals. Background frost/dust
+remains subtle. Transient particles are capped at 60 and removed on completion;
+both canvases ignore pointer events so they never block buttons. All motion
+can be disabled using:
 
 ```powershell
-$env:MULTIGRAVITY_REPO = 'SkrudjReal/multigravity-cli'
-$env:MULTIGRAVITY_REF = 'feature/frosted-neon-effects'
-irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/feature/frosted-neon-effects/install.ps1 | iex
+$env:MULTIGRAVITY_DISABLE_FX = '1'
 multigravity gui
 ```
 
-The installer preserves existing profile directories including `agy` and
-`op-agy`. It also updates the custom-icon GUI launcher and the
-**Multigravity Profile Manager** Start Menu shortcut. Unpin any stale
-PowerShell shortcut and pin the branded launcher if necessary.
+### Install development build
 
-### Windows checks
+Close Multigravity GUI, then in Windows PowerShell 5.1:
+
+```powershell
+$env:MULTIGRAVITY_REPO = 'SkrudjReal/multigravity-cli'
+$env:MULTIGRAVITY_REF = 'feature/glass-sakura-cursor'
+irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/feature/glass-sakura-cursor/install.ps1 | iex
+multigravity gui
+```
+
+The installer updates scripts and the branded launcher in
+`~/.local/bin`, **not** the existing profiles in
+`~/AntigravityProfiles`.
+
+### Validate on Windows
 
 ```powershell
 powershell.exe -NoProfile -STA -File .\tests\Test-WindowsGui.ps1
 ```
 
-The tests inspect WPF XAML, verify the default-login state, compile and attach
-the particle engine, and validate the upper bound on transient particles.
-Animation smoothness, brightness, resize behavior, and separate-account login
-still need a manual interactive check on Windows.
+CI / static checks are not a replacement for interactive visual confirmation
+of pointer glow and WPF animations on Windows 11.
 
 ---
 
