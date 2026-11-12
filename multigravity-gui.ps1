@@ -356,28 +356,82 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ListBoxItem">
-                        <Grid>
-                            <Border x:Name="RowChrome" CornerRadius="12"
-                                    Background="{TemplateBinding Background}"
-                                    BorderBrush="#373840" BorderThickness="1"
-                                    Padding="{TemplateBinding Padding}">
-                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        <Grid ClipToBounds="False">
+                            <Border x:Name="SelectedGlow" Margin="7,5"
+                                Background="#A52D70" CornerRadius="18"
+                                Opacity="0" IsHitTestVisible="False">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#F02E97"
+                                        ShadowDepth="0" BlurRadius="20" Opacity="0.7"/>
+                                </Border.Effect>
                             </Border>
-                            <Border x:Name="SelectionNeon" Width="3" Height="35"
+                            <Border x:Name="RowChrome" CornerRadius="18"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#34353D" BorderThickness="1"/>
+                            <Grid Margin="1" ClipToBounds="True" IsHitTestVisible="False">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.ColumnSpan="2" CornerRadius="17" Opacity="0.7">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0.8,1">
+                                            <GradientStop Color="#22FFFFFF" Offset="0"/>
+                                            <GradientStop Color="#08FFFFFF" Offset="0.4"/>
+                                            <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Border x:Name="QuarterSegment" Grid.Column="1"
+                                        CornerRadius="0,17,17,0" Opacity="0">
+                                    <Border.Background>
+                                        <RadialGradientBrush Center="0.98,0.5"
+                                            GradientOrigin="0.98,0.5" RadiusX="1.0" RadiusY="1.0">
+                                            <GradientStop Color="#C9FC3D97" Offset="0"/>
+                                            <GradientStop Color="#9CDB3F92" Offset="0.38"/>
+                                            <GradientStop Color="#00C72A81" Offset="1"/>
+                                        </RadialGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Border x:Name="SelectionNeon" Grid.Column="1"
                                     HorizontalAlignment="Right" VerticalAlignment="Center"
-                                    Background="#EC4791" CornerRadius="3" Opacity="0"
-                                    Margin="0,0,4,0" IsHitTestVisible="False"/>
+                                    Width="4" Height="32" Margin="0,0,4,0"
+                                    Background="#FC51A9" CornerRadius="4" Opacity="0"/>
+                                <Border x:Name="TopGlass" Grid.ColumnSpan="2"
+                                    Height="1" Margin="16,1,16,0"
+                                    VerticalAlignment="Top" CornerRadius="1" Opacity="0.24"
+                                    Background="#CBEAF3"/>
+                            </Grid>
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="RowChrome" Property="Background" Value="#30262F"/>
-                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#D75599"/>
+                                <Setter TargetName="RowChrome" Property="Background" Value="#29272E"/>
+                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#6D4A66"/>
+                                <Setter TargetName="TopGlass" Property="Opacity" Value="0.48"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter TargetName="RowChrome" Property="Background" Value="#3C2B37"/>
-                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#F05BA2"/>
-                                <Setter TargetName="SelectionNeon" Property="Opacity" Value="0.92"/>
+                                <Setter TargetName="RowChrome" Property="Background" Value="#31252D"/>
+                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#DF5C9E"/>
+                                <Setter TargetName="QuarterSegment" Property="Opacity" Value="0.97"/>
+                                <Setter TargetName="SelectedGlow" Property="Opacity" Value="0.18"/>
+                                <Setter TargetName="SelectionNeon" Property="Opacity" Value="0.95"/>
                             </Trigger>
+                            <EventTrigger RoutedEvent="ListBoxItem.MouseEnter">
+                                <BeginStoryboard><Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="TopGlass"
+                                        Storyboard.TargetProperty="Opacity" To="0.55"
+                                        Duration="0:0:0.18"/>
+                                </Storyboard></BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="ListBoxItem.MouseLeave">
+                                <BeginStoryboard><Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="TopGlass"
+                                        Storyboard.TargetProperty="Opacity" To="0.24"
+                                        Duration="0:0:0.28"/>
+                                </Storyboard></BeginStoryboard>
+                            </EventTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
