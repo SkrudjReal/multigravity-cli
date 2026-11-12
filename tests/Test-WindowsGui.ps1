@@ -139,9 +139,9 @@ if ($env:OS -eq 'Windows_NT') {
 # Visual-theme regression checks: the disabled button state must remain dark,
 # not fall back to the Windows default white control template.
 foreach ($fragment in @('x:Name="OrbitSpark"', 'Property="IsEnabled" Value="False"',
-                      'TargetName="Chrome" Property="Background" Value="#201A2C"',
+                      'TargetName="Chrome" Property="Background" Value="#1C1D22"',
                       'Style x:Key="DangerButton"', 'DoubleAnimation',
-                      'Color="#0D0917"', 'Property="BorderBrush" Value="#AE81D5"')) {
+                      'Color="#121317"', 'Property="BorderBrush" Value="#DE6BAC"')) {
     if (-not $source.Contains($fragment)) {
         throw "Missing astral UI theme or animation: $fragment"
     }
@@ -209,7 +209,7 @@ if (-not (Test-Path -LiteralPath $effectsPath)) {
 $effectsSource = [System.IO.File]::ReadAllText($effectsPath,
     [System.Text.Encoding]::UTF8)
 foreach ($needle in @('class FrostEffects', 'AddSnowflake', 'PreviewMouseMove',
-                      'PreviewMouseLeftButtonDown', 'MaxTransient = 55',
+                      'PreviewMouseLeftButtonDown', 'MaxTransient = 60',
                       'while (alive.Count >= MaxTransient)', 'window.Closed += Closed')) {
     if (-not $effectsSource.Contains($needle)) {
         throw "Missing performance/safety behavior in particle engine: $needle"
@@ -219,6 +219,41 @@ if (-not $installerSource.Contains('multigravity-effects.cs')) {
     throw 'Windows installer must download the effects source.'
 }
 Write-Host 'PASS: default independent login, frost styling, scrollbar and bounded particles.'
+
+# Glass/pill design: active rows and accent buttons reveal precisely the right
+# quarter of a radial magenta gradient with a softened outer glow.
+foreach ($name in @('QuarterGlow', 'QuarterSegment', 'AmbientGlow',
+                    'SelectedGlow', 'GlassSheen', 'GlassSheen', 'SelectionNeon')) {
+    if ($null -eq $xaml.SelectSingleNode("//*[@x:Name='$name']", $uiNamespace)) {
+        throw "Missing glass/pink-glow component: $name"
+    }
+}
+if (([regex]::Matches($source, 'Width="3\*"')).Count -lt 2 -or
+    ([regex]::Matches($source, 'Width="1\*"')).Count -lt 2) {
+    throw 'Glass buttons and profile rows must reserve 1/4 width for neon gradients.'
+}
+foreach ($token in @('DropShadowEffect Color="#F3389F"',
+                    'DropShadowEffect Color="#F02E97"',
+                    'RadialGradientBrush Center="0.97,0.50"',
+                    'RadialGradientBrush Center="0.98,0.5"')) {
+    if (-not $source.Contains($token)) {
+        throw "Missing glass/neon glow marker: $token"
+    }
+}
+# From the user's own aura-companion-plus CursorTrail.tsx:
+# 32ms spawning, 6-12px petals, +/-15px x drift, +10-30px y drift,
+# 700ms decay and 180-degree rotation. Click bloom is a companion addition.
+foreach ($token in @('TrailThrottleMs = 32', 'PetalGeometry',
+                    'DropShadowEffect', 'random.NextDouble()*30-15',
+                    '10+random.NextDouble()*20', '0.7,180,false',
+                    'SpawnFlash(p.X,p.Y)', 'SpawnPetal',
+                    'MaxTransient = 60', 'FadeRemove(leaf,seconds')) {
+    if (-not $effectsSource.Contains($token)) {
+        throw "Missing AURA cursor trail or click bloom behavior: $token"
+    }
+}
+Write-Host 'PASS: quarter-glass glows and AURA sakura cursor effects.'
+
 
 # Compile and instantiate the engine under the same Windows .NET Framework
 # environment that users have; XML-only checks previously missed bad XAML.
