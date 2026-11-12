@@ -1,7 +1,7 @@
-$ErrorActionPreference = "Stop"
+﻿$ErrorActionPreference = "Stop"
 
-$REPO = "sujitagarwal/multigravity-cli"
-$BRANCH = "main"
+$REPO = if ($env:MULTIGRAVITY_REPO) { $env:MULTIGRAVITY_REPO } else { "SkrudjReal/multigravity-cli" }
+$BRANCH = if ($env:MULTIGRAVITY_REF) { $env:MULTIGRAVITY_REF } else { "main" }
 $RAW = "https://raw.githubusercontent.com/$REPO/$BRANCH"
 $INSTALL_DIR = "$env:USERPROFILE\.local\bin"
 
@@ -38,14 +38,22 @@ if (!$IN_PATH) {
     Write-Host ""
 }
 
-Write-Step "Downloading multigravity.ps1..."
-# Use -UseBasicParsing for compatibility with PS 5.1 on some systems
-# We download to a string first to ensure we can save with the correct encoding
-try {
-    $scriptContent = Invoke-WebRequest -Uri "$RAW/multigravity.ps1" -UseBasicParsing -ErrorAction Stop
-    [System.IO.File]::WriteAllText("$INSTALL_DIR\multigravity.ps1", $scriptContent.Content, [System.Text.Encoding]::UTF8)
-} catch {
-    Abort "Failed to download multigravity.ps1: $_"
+# Download raw bytes and write UTF-8 with BOM for Windows PowerShell 5.1.
+$UTF8BOM = New-Object System.Text.UTF8Encoding($true)
+foreach ($name in @("multigravity.ps1", "multigravity-gui.ps1")) {
+    Write-Step "Downloading $name..."
+    $tempFile = Join-Path $INSTALL_DIR ($name + ".download")
+    try {
+        Invoke-WebRequest -Uri "$RAW/$name" -OutFile $tempFile -UseBasicParsing -ErrorAction Stop
+        $content = [System.IO.File]::ReadAllText($tempFile, [System.Text.Encoding]::UTF8)
+        [System.IO.File]::WriteAllText((Join-Path $INSTALL_DIR $name), $content, $UTF8BOM)
+    } catch {
+        Abort "Failed to download $name : $_"
+    } finally {
+        if (Test-Path -LiteralPath $tempFile) {
+            Remove-Item -LiteralPath $tempFile -Force
+        }
+    }
 }
 
 Write-Step "Creating wrapper script..."
@@ -64,3 +72,4 @@ Write-Host "Usage:"
 Write-Host "  multigravity help"
 Write-Host "  multigravity new <profile-name>"
 Write-Host "  multigravity <profile-name>"
+Write-Host "  multigravity gui"
