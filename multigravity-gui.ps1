@@ -52,12 +52,12 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
         Title="Multigravity | Profile Manager"
         Width="1060" Height="740" MinWidth="460" MinHeight="420"
         WindowStartupLocation="CenterScreen"
-        Background="#100B1A" Foreground="#E2D8ED"
-        FontFamily="Segoe UI" FontSize="13" UseLayoutRounding="True"
+        Background="#111216" Foreground="#ECECF0"
+        FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="13" FontWeight="Normal" TextOptions.TextFormattingMode="Display" TextOptions.TextRenderingMode="ClearType" UseLayoutRounding="True"
         SnapsToDevicePixels="True">
     <Window.Resources>
-        <SolidColorBrush x:Key="Gold" Color="#D0B989"/>
-        <SolidColorBrush x:Key="Muted" Color="#A99DBD"/>
+        <SolidColorBrush x:Key="Gold" Color="#E95B9C"/>
+        <SolidColorBrush x:Key="Muted" Color="#A2A2AE"/>
         <Style TargetType="Button">
             <Setter Property="Background" Value="#29203B"/>
             <Setter Property="Foreground" Value="#E2D8ED"/>
@@ -75,16 +75,35 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Chrome" CornerRadius="10"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
+                        <Grid ClipToBounds="True">
+                            <Border x:Name="Chrome" CornerRadius="12"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"/>
+                            <!-- A hint of silver frost on the top edge, never over the label. -->
+                            <Border x:Name="FrostRim" Height="2" VerticalAlignment="Top"
+                                    HorizontalAlignment="Stretch" Margin="12,2,12,0"
+                                    CornerRadius="2" Opacity="0.22" IsHitTestVisible="False">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                        <GradientStop Color="#00DBE5EE" Offset="0"/>
+                                        <GradientStop Color="#80DBE5EE" Offset="0.25"/>
+                                        <GradientStop Color="#39FFD5E8" Offset="0.65"/>
+                                        <GradientStop Color="#00DBE5EE" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                            </Border>
+                            <Border x:Name="AccentEdge" Width="3" Height="22"
+                                    Background="#EB4694" Opacity="0"
+                                    HorizontalAlignment="Right" VerticalAlignment="Center"
+                                    Margin="0,0,4,0" CornerRadius="3"
+                                    IsHitTestVisible="False"/>
                             <ContentPresenter Content="{TemplateBinding Content}"
                                               HorizontalAlignment="Center"
                                               VerticalAlignment="Center"
                                               Margin="{TemplateBinding Padding}"
                                               RecognizesAccessKey="True"/>
-                        </Border>
+                        </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="Chrome" Property="BorderBrush" Value="#AE81D5"/>
@@ -94,10 +113,28 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="Chrome" Property="Background" Value="#201A2C"/>
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#3C3049"/>
-                                <Setter Property="Foreground" Value="#796D85"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#33343C"/>
+                                <Setter TargetName="FrostRim" Property="Opacity" Value="0.06"/>
+                                <Setter Property="Foreground" Value="#777983"/>
                                 <Setter Property="Cursor" Value="Arrow"/>
                             </Trigger>
+
+                            <EventTrigger RoutedEvent="MouseEnter">
+                                <BeginStoryboard><Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="AccentEdge" Storyboard.TargetProperty="Opacity"
+                                                     To="0.82" Duration="0:0:0.18"/>
+                                    <DoubleAnimation Storyboard.TargetName="FrostRim" Storyboard.TargetProperty="Opacity"
+                                                     To="0.65" Duration="0:0:0.2"/>
+                                </Storyboard></BeginStoryboard>
+                            </EventTrigger>
+                            <EventTrigger RoutedEvent="MouseLeave">
+                                <BeginStoryboard><Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="AccentEdge" Storyboard.TargetProperty="Opacity"
+                                                     To="0" Duration="0:0:0.22"/>
+                                    <DoubleAnimation Storyboard.TargetName="FrostRim" Storyboard.TargetProperty="Opacity"
+                                                     To="0.22" Duration="0:0:0.22"/>
+                                </Storyboard></BeginStoryboard>
+                            </EventTrigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
@@ -173,7 +210,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <Border x:Name="BoxChrome" Width="17" Height="17"
                                     CornerRadius="4" BorderThickness="1"
-                                    BorderBrush="#75598B" Background="#24182F"
+                                    BorderBrush="#58445A" Background="#24182F"
                                     VerticalAlignment="Center">
                                 <Path x:Name="Tick" Data="M 3,8 L 7,12 L 14,4"
                                       Stroke="#EBD6FF" StrokeThickness="2"
@@ -200,6 +237,55 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                 </Setter.Value>
             </Setter>
         </Style>
+        <!-- Thin graphite scrollbar with a rounded, pink-on-hover thumb. -->
+        <Style x:Key="FrostThumb" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Border x:Name="TrackThumb" Background="#4E4E59"
+                                CornerRadius="4" Margin="1,3"/>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TrackThumb" Property="Background" Value="#B84583"/>
+                            </Trigger>
+                            <Trigger Property="IsDragging" Value="True">
+                                <Setter TargetName="TrackThumb" Property="Background" Value="#EB58A5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="ScrollBar">
+            <Setter Property="Width" Value="10"/>
+            <Setter Property="Background" Value="#17181C"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ScrollBar">
+                        <Border Background="#18191F" CornerRadius="5">
+                            <Track x:Name="PART_Track" Orientation="Vertical"
+                                   Minimum="{TemplateBinding Minimum}"
+                                   Maximum="{TemplateBinding Maximum}"
+                                   Value="{TemplateBinding Value}"
+                                   ViewportSize="{TemplateBinding ViewportSize}"
+                                   IsDirectionReversed="True">
+                                <Track.DecreaseRepeatButton>
+                                    <RepeatButton Opacity="0" IsTabStop="False"
+                                                  Command="ScrollBar.PageUpCommand"/>
+                                </Track.DecreaseRepeatButton>
+                                <Track.Thumb>
+                                    <Thumb Style="{StaticResource FrostThumb}"/>
+                                </Track.Thumb>
+                                <Track.IncreaseRepeatButton>
+                                    <RepeatButton Opacity="0" IsTabStop="False"
+                                                  Command="ScrollBar.PageDownCommand"/>
+                                </Track.IncreaseRepeatButton>
+                            </Track>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
         <Style TargetType="ListBoxItem">
             <Setter Property="Background" Value="#23182F"/>
             <Setter Property="Foreground" Value="#E2D8ED"/>
@@ -212,7 +298,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                     <ControlTemplate TargetType="ListBoxItem">
                         <Border x:Name="RowChrome" CornerRadius="12"
                                 Background="{TemplateBinding Background}"
-                                BorderBrush="#453352" BorderThickness="1"
+                                BorderBrush="#373840" BorderThickness="1"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         </Border>
@@ -232,11 +318,12 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
         </Style>
     </Window.Resources>
     <Grid ClipToBounds="True">
+        <Canvas x:Name="FxSky" ClipToBounds="True" Panel.ZIndex="0" IsHitTestVisible="False" />
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#0D0917" Offset="0"/>
-                <GradientStop Color="#1A102A" Offset="0.53"/>
-                <GradientStop Color="#0D0A19" Offset="1"/>
+                <GradientStop Color="#121317" Offset="0"/>
+                <GradientStop Color="#1A1B20" Offset="0.53"/>
+                <GradientStop Color="#101115" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
         <Ellipse Width="560" Height="560" HorizontalAlignment="Right"
@@ -276,16 +363,16 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
-                        <TextBlock x:Name="OrbitSpark" Text="&#x2726;" Foreground="#C6A87D" FontSize="17" Margin="0,0,9,0"/>
-                        <TextBlock Text="MULTIGRAVITY" Foreground="#C6A87D"
+                        <TextBlock x:Name="OrbitSpark" Text="&#x2726;" Foreground="#E69CBD" FontSize="17" Margin="0,0,9,0"/>
+                        <TextBlock Text="MULTIGRAVITY" Foreground="#E69CBD"
                                    FontSize="12" FontWeight="SemiBold"/>
                         <TextBlock Text="   /   PROFILE CONSTELLATION" Foreground="#867593"
                                    FontSize="11" VerticalAlignment="Center"/>
                     </StackPanel>
-                    <TextBlock Text="Profile Manager" Foreground="#E8DAF3"
-                               FontSize="30" FontWeight="Light" Margin="0,0,0,4"/>
+                    <TextBlock Text="Profile Manager" Foreground="#F0EFF2"
+                               FontSize="30" FontWeight="SemiBold" Margin="0,0,0,4"/>
                     <TextBlock Text="Every identity, its own orbit."
-                               Foreground="#A899B5" FontSize="12"/>
+                               Foreground="#A0A3AC" FontSize="12"/>
                 </StackPanel>
                 <Button x:Name="RefreshButton" Grid.Column="1"
                         Content="&#x21BB;  Refresh" VerticalAlignment="Bottom"
@@ -304,8 +391,8 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         <ColumnDefinition Width="1*"/>
                     </Grid.ColumnDefinitions>
                     <Border x:Name="ProfilesPanel" Grid.Column="0"
-                            BorderThickness="1" BorderBrush="#544068"
-                            Background="#D9181025" CornerRadius="18"
+                            BorderThickness="1" BorderBrush="#393A46"
+                            Background="#E31B1C22" CornerRadius="18"
                             Padding="20" MinHeight="400">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -318,9 +405,9 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                             <Grid Grid.Row="0">
                                 <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="&#x2726;" Foreground="#C6A87D"
+                                    <TextBlock Text="&#x2726;" Foreground="#E69CBD"
                                                Margin="0,0,8,0" FontSize="13"/>
-                                    <TextBlock Text="YOUR PROFILES" Foreground="#D4C2E0"
+                                    <TextBlock Text="YOUR PROFILES" Foreground="#D6D6DC"
                                                FontWeight="SemiBold" FontSize="12"/>
                                 </StackPanel>
                                 <TextBlock x:Name="CountText" Grid.Column="1"
@@ -340,7 +427,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                                             </Grid.ColumnDefinitions>
                                             <Border Width="32" Height="32" CornerRadius="9"
                                                     BorderThickness="1" BorderBrush="#705283"
-                                                    Background="#392447" VerticalAlignment="Center"
+                                                    Background="#372533" VerticalAlignment="Center"
                                                     Margin="0,0,11,0">
                                                 <TextBlock Text="&#x2726;" HorizontalAlignment="Center"
                                                            VerticalAlignment="Center" Foreground="#C7A7D4"
@@ -379,18 +466,18 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                         </Grid>
                     </Border>
                     <Border x:Name="DetailsPanel" Grid.Column="2"
-                            BorderThickness="1" BorderBrush="#544068"
-                            Background="#DF1B1228" CornerRadius="18" Padding="22">
+                            BorderThickness="1" BorderBrush="#393A46"
+                            Background="#E31B1C22" CornerRadius="18" Padding="22">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                <TextBlock Text="&#x2726;" Foreground="#C6A87D"
+                                <TextBlock Text="&#x2726;" Foreground="#E69CBD"
                                            FontSize="13" Margin="0,0,8,0"/>
-                                <TextBlock Text="SELECTED IDENTITY" Foreground="#D4C2E0"
+                                <TextBlock Text="SELECTED IDENTITY" Foreground="#D6D6DC"
                                            FontWeight="SemiBold" FontSize="12"/>
                             </StackPanel>
                             <TextBlock x:Name="SelectedName" Text="Select a profile"
-                                       TextWrapping="Wrap" Foreground="#E8DAF3"
-                                       FontWeight="Light" FontSize="26" Margin="0,5,0,6"/>
+                                       TextWrapping="Wrap" Foreground="#F0EFF2"
+                                       FontWeight="SemiBold" FontSize="26" Margin="0,5,0,6"/>
                             <TextBlock x:Name="SelectedType" Text="No profile selected"
                                        Foreground="#BD9CC9" FontSize="12"/>
                             <TextBlock x:Name="SelectedPath" TextWrapping="Wrap"
@@ -398,7 +485,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                                        Margin="0,12,0,18"/>
                             <Button x:Name="LaunchButton" Content="&#x2726;  Launch Antigravity"
                                     Style="{StaticResource AccentButton}" Margin="0,0,0,12"/>
-                            <CheckBox x:Name="IsolatedAuthCheck" Content="Independent login"
+                            <CheckBox x:Name="IsolatedAuthCheck" Content="Independent login" IsChecked="True"
                                       Margin="0,0,0,7"/>
                             <TextBlock Text="Store sign-in files separately for this profile. Keep profile folders private."
                                        Foreground="#9786A8" TextWrapping="Wrap"
@@ -431,17 +518,42 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                 <TextBlock x:Name="StatusText" Text="Ready."
                            Foreground="#B7A5CB" FontSize="11"
                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="&#x2726;   ASTRAL INTERFACE"
-                           Foreground="#8A769E" FontSize="10" Margin="12,0,0,0"
+                <TextBlock Grid.Column="1" Text="&#x2726;   FROST / NEON"
+                           Foreground="#92949E" FontSize="10" Margin="12,0,0,0"
                            VerticalAlignment="Center"/>
             </Grid>
         </Grid>
+        <Canvas x:Name="FxSparks" ClipToBounds="True" Panel.ZIndex="20" IsHitTestVisible="False"/>
     </Grid>
 </Window>
 '@
 
 $reader = New-Object System.Xml.XmlNodeReader $xaml
 $script:Window = [Windows.Markup.XamlReader]::Load($reader)
+
+# Keep animated visuals in a separate source file and disable them cleanly
+# when the runtime cannot compile the optional effect engine.
+$script:FxSky = $script:Window.FindName('FxSky')
+$script:FxSparks = $script:Window.FindName('FxSparks')
+$effectsFile = Join-Path $PSScriptRoot 'multigravity-effects.cs'
+if (Test-Path -LiteralPath $effectsFile) {
+    try {
+        if (-not ('Multigravity.FrostEffects' -as [type])) {
+            $references = @(
+                [System.Windows.Window].Assembly.Location,
+                [System.Windows.Media.Brush].Assembly.Location,
+                [System.Windows.DependencyObject].Assembly.Location,
+                [System.Windows.Controls.Canvas].Assembly.Location
+            ) | Select-Object -Unique
+            Add-Type -Path $effectsFile -ReferencedAssemblies $references -ErrorAction Stop
+        }
+        $script:FxEngine = [Multigravity.FrostEffects]::Attach(
+            $script:Window, $script:FxSky, $script:FxSparks)
+    } catch {
+        Write-Warning "Decorative effects disabled: $_"
+    }
+}
+
 
 # Set the window and taskbar icon from the icon bundled by install.ps1.
 $iconPath = Join-Path $PSScriptRoot 'multigravity-gui-icon.png'
