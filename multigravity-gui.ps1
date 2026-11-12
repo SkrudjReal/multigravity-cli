@@ -11,6 +11,7 @@ if ([System.Threading.Thread]::CurrentThread.GetApartmentState() -ne [System.Thr
 Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
+Add-Type -AssemblyName System.Xaml
 
 Add-Type -AssemblyName System.Drawing
 
@@ -541,7 +542,8 @@ if ((Test-Path -LiteralPath $effectsFile) -and ($env:MULTIGRAVITY_DISABLE_FX -ne
                 [System.Windows.Window].Assembly.Location,
                 [System.Windows.Media.Brush].Assembly.Location,
                 [System.Windows.DependencyObject].Assembly.Location,
-                [System.Windows.Controls.Canvas].Assembly.Location
+                [System.Windows.Controls.Canvas].Assembly.Location,
+                [System.Xaml.XamlObjectWriter].Assembly.Location
             ) | Select-Object -Unique
             Add-Type -Path $effectsFile -ReferencedAssemblies $references -ErrorAction Stop
         }
