@@ -85,61 +85,56 @@ Do not run `multigravity update` until this fork branch is merged.
 
 ---
 
-## Windows WPF Profile Manager (Astral theme)
+## Windows WPF Profile Manager (Frost / Neon)
 
-This fork includes a WPF profile manager with an original purple-and-gold
-space-opera interface. It draws on the visual *language* of Honkai: Star Rail:
-deep amethyst surfaces, gold accents, gently animated controls and a subtle
-celestial glow. No HoYoverse artwork or assets are included.
+This branch adds a graphite-and-magenta Windows profile manager with a soft
+moving backdrop, airborne frosted dust, glowing click sparkles and a short
+cursor glitter trail. It is built on native WPF, not Electron or a browser.
 
-- Shows existing full/shared Antigravity profiles; no account migration.
-- Create, launch, rename, and remove profiles using the existing CLI.
-- **Independent login** is an opt-in mode with documented credential-storage
-  caveats (see the section above). Its implementation is still undocumented.
-- Responsive panels stack in narrow windows, while scrolling keeps controls
-  reachable at small heights.
-- Buttons and checkboxes have custom muted WPF templates, including disabled
-  states; there are no white Windows-themed default buttons.
-- A gentle header entrance, star pulse and fast hover transitions enhance
-  feedback without distracting from work.
+- **Independent login** is checked by default. This still uses an undocumented
+  file-backed credential workaround; profile token files must stay private.
+  Untick the option to use the Windows Credential Manager path.
+- Modern **Segoe UI Variable Text** typography with ClearType rendering.
+- Dark charcoal panels, soft neon-pink accents on selection and hover,
+  hand-tuned dark/disabled buttons, and a subtle frost highlight at button edges.
+- Custom thin rounded scrollbar that turns pink when hovered/dragged.
+- Gentle header fade/slide and selected-profile fade, plus low-amplitude
+  glowing background movement.
+- 23 slow snow/dust particles behind content, a 34 ms cursor-trail throttle,
+  and small click bursts. Transient particles are capped at **55**.
+  The canvas cannot intercept clicks; the particle engine releases all elements
+  when the window closes.
 
-### Branded taskbar icon
+The animation implementation lives in `multigravity-effects.cs` and is
+compiled locally by Windows PowerShell's built-in .NET Framework compiler.
+If compilation fails, the profile manager still opens without particle effects.
 
-The installer downloads a custom PNG, writes a Windows ICO and tries to build
-`MultigravityProfileManager.exe` using the .NET Framework C# compiler
-included with Windows. The tiny launcher runs the PowerShell WPF interface in
-its own process with a native executable icon. The Start Menu shortcut and
-`multigravity gui` prefer this executable when present.
+### Install this experimental branch
 
-If the compiler is unavailable, the installer falls back to launching the
-PowerShell script; the script sets a dedicated AppUserModelID and a window icon.
-**An already-pinned PowerShell shortcut may need to be unpinned and replaced
-with the new Multigravity Profile Manager shortcut.**
-
-### Install this development branch
-
-From a fresh Windows PowerShell 5.1 terminal:
+Open a new Windows PowerShell 5.1 window:
 
 ```powershell
 $env:MULTIGRAVITY_REPO = 'SkrudjReal/multigravity-cli'
-$env:MULTIGRAVITY_REF = 'feature/astral-purple-wpf'
-irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/feature/astral-purple-wpf/install.ps1 | iex
+$env:MULTIGRAVITY_REF = 'feature/frosted-neon-effects'
+irm https://raw.githubusercontent.com/SkrudjReal/multigravity-cli/feature/frosted-neon-effects/install.ps1 | iex
 multigravity gui
 ```
 
-Existing profile folders are not overwritten by the installer.
-`install.ps1` is BOM-free to work when piped into `iex`; the
-installed PowerShell scripts retain a UTF-8 BOM for PowerShell 5.1.
+The installer preserves existing profile directories including `agy` and
+`op-agy`. It also updates the custom-icon GUI launcher and the
+**Multigravity Profile Manager** Start Menu shortcut. Unpin any stale
+PowerShell shortcut and pin the branded launcher if necessary.
 
-### Validate on Windows
+### Windows checks
 
 ```powershell
-powershell.exe -NoProfile -File .\tests\Test-WindowsGui.ps1
+powershell.exe -NoProfile -STA -File .\tests\Test-WindowsGui.ps1
 ```
 
-A GitHub Actions Windows runner also performs PowerShell syntax and WPF XAML
-loading checks for this branch. Interactive resize, animation and two-account
-tests still need a local Windows verification.
+The tests inspect WPF XAML, verify the default-login state, compile and attach
+the particle engine, and validate the upper bound on transient particles.
+Animation smoothness, brightness, resize behavior, and separate-account login
+still need a manual interactive check on Windows.
 
 ---
 
