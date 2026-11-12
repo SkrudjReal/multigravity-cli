@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
 Run multiple Antigravity IDE profiles at the same time.
 #>
@@ -63,6 +63,7 @@ function Write-Usage {
     Write-Host "      --shared                Share extensions & settings; isolate only accounts"
     Write-Host "      --from <template>        Seed from a saved template"
     Write-Host "  list                        List existing profiles"
+    Write-Host "  gui                         Open the Windows WPF profile manager"
     Write-Host "  status                      Show running state, type, and last-used per profile"
     Write-Host "  rename <old> <new>          Rename a profile (updates shortcut if present)"
     Write-Host "  delete <name>               Delete a profile and its data"
@@ -629,6 +630,19 @@ switch ($cmd) {
     }
     "list" {
         Invoke-ListProfiles
+    }
+    "gui" {
+        $guiPath = Join-Path $PSScriptRoot 'multigravity-gui.ps1'
+        if (!(Test-Path -LiteralPath $guiPath)) {
+            Write-Error "WPF GUI not installed. Place multigravity-gui.ps1 next to multigravity.ps1."
+            exit 1
+        }
+        if ([System.Threading.Thread]::CurrentThread.GetApartmentState() -ne [System.Threading.ApartmentState]::STA) {
+            $arguments = '-NoProfile -STA -ExecutionPolicy Bypass -File "' + $guiPath + '"'
+            Start-Process -FilePath (Join-Path $PSHOME 'powershell.exe') -ArgumentList $arguments
+        } else {
+            & $guiPath
+        }
     }
     "status" {
         Invoke-StatusProfiles
