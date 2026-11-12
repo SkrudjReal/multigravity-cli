@@ -12,6 +12,28 @@ Add-Type -AssemblyName PresentationFramework
 Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
 
+Add-Type -AssemblyName System.Drawing
+
+# PowerShell is the host executable, so explicitly separate this app from
+# generic PowerShell windows in the taskbar before creating the WPF window.
+if (-not ('MultigravityTaskbar' -as [type])) {
+    Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+
+public static class MultigravityTaskbar {
+    [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+    public static extern int SetCurrentProcessExplicitAppUserModelID(string appID);
+
+    [DllImport("user32.dll", CharSet = CharSet.Auto)]
+    public static extern IntPtr SendMessage(IntPtr hwnd, int message, IntPtr wparam, IntPtr lparam);
+}
+'@
+}
+[void][MultigravityTaskbar]::SetCurrentProcessExplicitAppUserModelID(
+    'SkrudjReal.Multigravity.ProfileManager')
+
+
 $script:CliPath = Join-Path $PSScriptRoot 'multigravity.ps1'
 if (-not (Test-Path -LiteralPath $script:CliPath)) {
     throw "Cannot find multigravity.ps1 next to $PSCommandPath"
@@ -439,6 +461,28 @@ if (Test-Path -LiteralPath $iconPath) {
         Write-Warning "Could not load Multigravity window icon: $_"
     } finally {
         if ($null -ne $iconStream) { $iconStream.Dispose() }
+    }
+}
+
+# A shortcut's .IconLocation alone doesn't change the running PowerShell
+# process icon. Set the WPF window's native small and large icons explicitly.
+$nativeIconPath = Join-Path $PSScriptRoot 'multigravity-gui.ico'
+if (Test-Path -LiteralPath $nativeIconPath) {
+    try {
+        $script:NativeIcon = New-Object System.Drawing.Icon($nativeIconPath)
+        $script:Window.Add_SourceInitialized({
+            $helper = New-Object System.Windows.Interop.WindowInteropHelper($script:Window)
+            $hwnd = $helper.Handle
+            if ($hwnd -ne [IntPtr]::Zero) {
+                [void][MultigravityTaskbar]::SendMessage($hwnd, 0x80, [IntPtr]1, $script:NativeIcon.Handle)
+                [void][MultigravityTaskbar]::SendMessage($hwnd, 0x80, [IntPtr]0, $script:NativeIcon.Handle)
+            }
+        })
+        $script:Window.Add_Closed({
+            if ($null -ne $script:NativeIcon) { $script:NativeIcon.Dispose() }
+        })
+    } catch {
+        Write-Warning "Could not set native Multigravity taskbar icon: $_"
     }
 }
 $script:ProfileList = $script:Window.FindName('ProfileList')
