@@ -4,6 +4,7 @@ on:
     branches:
       - feature/astral-purple-wpf
       - feature/frosted-neon-effects
+      - feature/glass-sakura-cursor
   pull_request:
   workflow_dispatch:
 
