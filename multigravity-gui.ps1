@@ -548,6 +548,7 @@ if (Test-Path -LiteralPath $effectsFile) {
         $script:FxEngine = [Multigravity.FrostEffects]::Attach(
             $script:Window, $script:FxSky, $script:FxSparks)
     } catch {
+        $script:FxLoadError = $_.Exception.Message
         Write-Warning "Decorative effects disabled: $_"
     }
 }
@@ -604,6 +605,10 @@ $script:RenameInput = $script:Window.FindName('RenameInput')
 $script:NewNameInput = $script:Window.FindName('NewNameInput')
 $script:SharedCheck = $script:Window.FindName('SharedCheck')
 $script:StatusText = $script:Window.FindName('StatusText')
+if ($script:FxLoadError) {
+    $script:StatusText.Text = 'Visual effects unavailable: ' + $script:FxLoadError
+}
+
 $script:ProfilesLayout = $script:Window.FindName('ProfilesLayout')
 $script:DetailsPanel = $script:Window.FindName('DetailsPanel')
 $script:RefreshButton = $script:Window.FindName('RefreshButton')
