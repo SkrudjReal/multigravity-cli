@@ -153,6 +153,76 @@ foreach ($fragment in @('/target:winexe', '/win32icon:', 'multigravity-gui-launc
     }
 }
 Write-Host 'PASS: branded taskbar identity, custom dark controls, and WPF motion present.'
-Write-Host 'NOTE: Windows resize, runtime animations, and login isolation still need an interactive test.'
+
+# Frost / Neon appearance and input effects tests.
+$uiNamespace = New-Object System.Xml.XmlNamespaceManager($xaml.NameTable)
+$uiNamespace.AddNamespace('x', 'http://schemas.microsoft.com/winfx/2006/xaml')
+$login = $xaml.SelectSingleNode("//*[@x:Name='IsolatedAuthCheck']", $uiNamespace)
+if ($null -eq $login -or $login.GetAttribute('IsChecked') -ne 'True') {
+    throw 'Independent login must be checked by default.'
+}
+foreach ($element in @('FxSky', 'FxSparks', 'FrostRim', 'AccentEdge',
+                        'SelectionNeon', 'TrackThumb')) {
+    if ($null -eq $xaml.SelectSingleNode("//*[@x:Name='$element']", $uiNamespace)) {
+        throw "Missing frost/neon component: $element"
+    }
+}
+if (-not $source.Contains('TextOptions.TextRenderingMode="ClearType"')) {
+    throw 'Expected refined WPF font rendering configuration.'
+}
+if (-not $source.Contains('FontFamily="Segoe UI Variable Text, Segoe UI"')) {
+    throw 'Expected friendly, legible Windows typography.'
+}
+if (-not $source.Contains('x:Key="FrostThumb"')) {
+    throw 'Custom scrollbar thumb style missing.'
+}
+if (-not $source.Contains('TargetProperty="Opacity"')) {
+    throw 'Missing opacity / hover animations.'
+}
+
+$effectsPath = Join-Path $root 'multigravity-effects.cs'
+if (-not (Test-Path -LiteralPath $effectsPath)) {
+    throw 'WPF effects C# source is missing.'
+}
+$effectsSource = [System.IO.File]::ReadAllText($effectsPath,
+    [System.Text.Encoding]::UTF8)
+foreach ($needle in @('class FrostEffects', 'AddSnowflake', 'PreviewMouseMove',
+                      'PreviewMouseLeftButtonDown', 'MaxTransient = 55',
+                      'while (alive.Count >= MaxTransient)', 'window.Closed += Closed')) {
+    if (-not $effectsSource.Contains($needle)) {
+        throw "Missing performance/safety behavior in particle engine: $needle"
+    }
+}
+if (-not $installerSource.Contains('multigravity-effects.cs')) {
+    throw 'Windows installer must download the effects source.'
+}
+Write-Host 'PASS: default independent login, frost styling, scrollbar and bounded particles.'
+
+# Compile and instantiate the engine under the same Windows .NET Framework
+# environment that users have; XML-only checks previously missed bad XAML.
+if ($env:OS -eq 'Windows_NT') {
+    $references = @(
+        [System.Windows.Window].Assembly.Location,
+        [System.Windows.Media.Brush].Assembly.Location,
+        [System.Windows.DependencyObject].Assembly.Location,
+        [System.Windows.Controls.Canvas].Assembly.Location
+    ) | Select-Object -Unique
+    Add-Type -Path $effectsPath -ReferencedAssemblies $references -ErrorAction Stop
+    $reader = New-Object System.Xml.XmlNodeReader $xaml
+    $fxWindow = [Windows.Markup.XamlReader]::Load($reader)
+    try {
+        $sky = $fxWindow.FindName('FxSky')
+        $sparks = $fxWindow.FindName('FxSparks')
+        $fx = [Multigravity.FrostEffects]::Attach($fxWindow, $sky, $sparks)
+        if ($sky.Children.Count -lt 25) {
+            throw "Expected background layers and snowflakes; got $($sky.Children.Count)"
+        }
+        Write-Host 'PASS: real WPF snow/particle engine compiles and attaches.'
+    } finally {
+        $fxWindow.Close()
+    }
+}
+Write-Host 'NOTE: Mouse glow and animation smoothness still require a visual Windows test.'
+
 
 
