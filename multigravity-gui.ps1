@@ -76,64 +76,122 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Grid ClipToBounds="True">
-                            <Border x:Name="Chrome" CornerRadius="12"
+                        <Grid ClipToBounds="False">
+                            <!-- Ambient neon light outside the glass surface. -->
+                            <Border x:Name="AmbientGlow" Margin="9,7,9,7"
+                                    Background="#B42D74" CornerRadius="22"
+                                    Opacity="0" IsHitTestVisible="False">
+                                <Border.Effect>
+                                    <DropShadowEffect Color="#F3389F" ShadowDepth="0"
+                                                      BlurRadius="24" Opacity="0.75"/>
+                                </Border.Effect>
+                            </Border>
+                            <Border x:Name="Chrome" CornerRadius="22"
                                     Background="{TemplateBinding Background}"
                                     BorderBrush="{TemplateBinding BorderBrush}"
                                     BorderThickness="{TemplateBinding BorderThickness}"/>
-                            <!-- A hint of silver frost on the top edge, never over the label. -->
-                            <Border x:Name="FrostRim" Height="2" VerticalAlignment="Top"
-                                    HorizontalAlignment="Stretch" Margin="12,2,12,0"
-                                    CornerRadius="2" Opacity="0.22" IsHitTestVisible="False">
-                                <Border.Background>
-                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                        <GradientStop Color="#00DDEAF1" Offset="0"/>
-                                        <GradientStop Color="#80DBE5EE" Offset="0.25"/>
-                                        <GradientStop Color="#39FFD5E8" Offset="0.65"/>
-                                        <GradientStop Color="#00DDEAF1" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Border.Background>
-                            </Border>
-                            <Border x:Name="AccentEdge" Width="3" Height="22"
-                                    Background="#EB4694" Opacity="0"
-                                    HorizontalAlignment="Right" VerticalAlignment="Center"
-                                    Margin="0,0,4,0" CornerRadius="3"
-                                    IsHitTestVisible="False"/>
+                            <Grid Margin="1" ClipToBounds="True" IsHitTestVisible="False">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="3*"/>
+                                    <ColumnDefinition Width="1*"/>
+                                </Grid.ColumnDefinitions>
+                                <!-- Satin glass reflection, independent of selection. -->
+                                <Border x:Name="GlassSheen" Grid.ColumnSpan="2"
+                                        CornerRadius="21" Opacity="0.6">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="0.8,1">
+                                            <GradientStop Color="#26FFFFFF" Offset="0"/>
+                                            <GradientStop Color="#08FFFFFF" Offset="0.4"/>
+                                            <GradientStop Color="#00FFFFFF" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <!-- Exactly the rightmost 1/4 of the button. -->
+                                <Border x:Name="QuarterGlow" Grid.Column="1"
+                                        CornerRadius="0,21,21,0" Opacity="0.15">
+                                    <Border.Background>
+                                        <RadialGradientBrush Center="0.97,0.50"
+                                            GradientOrigin="0.97,0.50" RadiusX="1.1" RadiusY="1.1">
+                                            <GradientStop Color="#D0FF459F" Offset="0"/>
+                                            <GradientStop Color="#86D6378E" Offset="0.4"/>
+                                            <GradientStop Color="#00D6378E" Offset="1"/>
+                                        </RadialGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Border x:Name="FrostRim" Grid.ColumnSpan="2"
+                                        Height="2" VerticalAlignment="Top" Margin="14,1,14,0"
+                                        CornerRadius="2" Opacity="0.26">
+                                    <Border.Background>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#00EAF5FA" Offset="0"/>
+                                            <GradientStop Color="#78EAF5FA" Offset="0.2"/>
+                                            <GradientStop Color="#38FFACD7" Offset="0.74"/>
+                                            <GradientStop Color="#00EAF5FA" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Border.Background>
+                                </Border>
+                                <Border x:Name="AccentEdge" Grid.Column="1"
+                                        Width="3" Height="26" Margin="0,0,4,0"
+                                        HorizontalAlignment="Right" VerticalAlignment="Center"
+                                        CornerRadius="3" Background="#F442A2" Opacity="0"/>
+                            </Grid>
                             <ContentPresenter Content="{TemplateBinding Content}"
-                                              HorizontalAlignment="Center"
-                                              VerticalAlignment="Center"
-                                              Margin="{TemplateBinding Padding}"
-                                              RecognizesAccessKey="True"/>
+                                HorizontalAlignment="Center" VerticalAlignment="Center"
+                                Margin="{TemplateBinding Padding}"
+                                RecognizesAccessKey="True"/>
                         </Grid>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="Tag" Value="Accent">
+                                <Setter TargetName="QuarterGlow" Property="Opacity" Value="0.75"/>
+                                <Setter TargetName="AmbientGlow" Property="Opacity" Value="0.17"/>
+                                <Setter TargetName="AccentEdge" Property="Opacity" Value="0.55"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#DF6DA9"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#DE6BAC"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Chrome" Property="Background" Value="#492C3F"/>
+                                <Setter TargetName="Chrome" Property="Background" Value="#45303B"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="Chrome" Property="Background" Value="#1D1E23"/>
-                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#33343C"/>
+                                <Setter TargetName="Chrome" Property="Background" Value="#1C1D22"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#303039"/>
+                                <Setter TargetName="QuarterGlow" Property="Opacity" Value="0"/>
+                                <Setter TargetName="AmbientGlow" Property="Opacity" Value="0"/>
+                                <Setter TargetName="AccentEdge" Property="Opacity" Value="0"/>
                                 <Setter TargetName="FrostRim" Property="Opacity" Value="0.06"/>
-                                <Setter Property="Foreground" Value="#777983"/>
+                                <Setter Property="Foreground" Value="#777A84"/>
                                 <Setter Property="Cursor" Value="Arrow"/>
                             </Trigger>
-
                             <EventTrigger RoutedEvent="MouseEnter">
                                 <BeginStoryboard><Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="AccentEdge" Storyboard.TargetProperty="Opacity"
-                                                     To="0.82" Duration="0:0:0.18"/>
-                                    <DoubleAnimation Storyboard.TargetName="FrostRim" Storyboard.TargetProperty="Opacity"
-                                                     To="0.65" Duration="0:0:0.2"/>
+                                    <DoubleAnimation Storyboard.TargetName="QuarterGlow"
+                                        Storyboard.TargetProperty="Opacity" To="0.88"
+                                        Duration="0:0:0.22"/>
+                                    <DoubleAnimation Storyboard.TargetName="AmbientGlow"
+                                        Storyboard.TargetProperty="Opacity" To="0.30"
+                                        Duration="0:0:0.23"/>
+                                    <DoubleAnimation Storyboard.TargetName="AccentEdge"
+                                        Storyboard.TargetProperty="Opacity" To="0.92"
+                                        Duration="0:0:0.20"/>
+                                    <DoubleAnimation Storyboard.TargetName="FrostRim"
+                                        Storyboard.TargetProperty="Opacity" To="0.67"
+                                        Duration="0:0:0.20"/>
                                 </Storyboard></BeginStoryboard>
                             </EventTrigger>
                             <EventTrigger RoutedEvent="MouseLeave">
                                 <BeginStoryboard><Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="AccentEdge" Storyboard.TargetProperty="Opacity"
-                                                     To="0" Duration="0:0:0.22"/>
-                                    <DoubleAnimation Storyboard.TargetName="FrostRim" Storyboard.TargetProperty="Opacity"
-                                                     To="0.22" Duration="0:0:0.22"/>
+                                    <DoubleAnimation Storyboard.TargetName="QuarterGlow"
+                                        Storyboard.TargetProperty="Opacity" To="0.15"
+                                        Duration="0:0:0.28"/>
+                                    <DoubleAnimation Storyboard.TargetName="AmbientGlow"
+                                        Storyboard.TargetProperty="Opacity" To="0"
+                                        Duration="0:0:0.30"/>
+                                    <DoubleAnimation Storyboard.TargetName="AccentEdge"
+                                        Storyboard.TargetProperty="Opacity" To="0"
+                                        Duration="0:0:0.28"/>
+                                    <DoubleAnimation Storyboard.TargetName="FrostRim"
+                                        Storyboard.TargetProperty="Opacity" To="0.26"
+                                        Duration="0:0:0.28"/>
                                 </Storyboard></BeginStoryboard>
                             </EventTrigger>
                         </ControlTemplate.Triggers>
@@ -164,6 +222,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
             </Style.Triggers>
         </Style>
         <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Tag" Value="Accent"/>
             <Setter Property="Background" Value="#54283E"/>
             <Setter Property="BorderBrush" Value="#C74D8A"/>
             <Setter Property="Foreground" Value="#FBE5F0"/>
