@@ -65,7 +65,7 @@ try {
     Invoke-WebRequest -Uri "$RAW/assets/multigravity-gui-icon.png" -OutFile $iconTmp -UseBasicParsing -ErrorAction Stop
     Move-Item -LiteralPath $iconTmp -Destination $pngPath -Force
     $png = [System.IO.File]::ReadAllBytes($pngPath)
-    $writer = New-Object System.IO.BinaryWriter([System.IO.File]::Create($icoPath))
+    $writer = [System.IO.BinaryWriter]::new([System.IO.File]::Create($icoPath))
     try {
         $writer.Write([uint16]0)
         $writer.Write([uint16]1)
