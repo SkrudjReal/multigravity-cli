@@ -25,194 +25,394 @@ $script:ProfilesRoot = if ($env:MULTIGRAVITY_HOME) {
 $script:PSExe = Join-Path $PSHOME 'powershell.exe'
 
 [xml]$xaml = @'
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Multigravity | Profile Manager"
-        Width="1060" Height="740" MinWidth="450" MinHeight="380"
+        Width="1060" Height="740" MinWidth="460" MinHeight="420"
         WindowStartupLocation="CenterScreen"
-        Background="#0B1020" Foreground="#EAF0FF"
-        FontFamily="Segoe UI" FontSize="13">
+        Background="#100B1A" Foreground="#E2D8ED"
+        FontFamily="Segoe UI" FontSize="13" UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
     <Window.Resources>
+        <SolidColorBrush x:Key="Gold" Color="#D0B989"/>
+        <SolidColorBrush x:Key="Muted" Color="#A99DBD"/>
         <Style TargetType="Button">
-            <Setter Property="Background" Value="#293552"/>
-            <Setter Property="Foreground" Value="#F4F7FF"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="15,10"/>
+            <Setter Property="Background" Value="#29203B"/>
+            <Setter Property="Foreground" Value="#E2D8ED"/>
+            <Setter Property="BorderBrush" Value="#57416C"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="18,11"/>
             <Setter Property="Margin" Value="0,0,8,0"/>
+            <Setter Property="MinHeight" Value="39"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+            <Setter Property="RenderTransform">
+                <Setter.Value><ScaleTransform ScaleX="1" ScaleY="1"/></Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chrome" CornerRadius="10"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              HorizontalAlignment="Center"
+                                              VerticalAlignment="Center"
+                                              Margin="{TemplateBinding Padding}"
+                                              RecognizesAccessKey="True"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#AE81D5"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Chrome" Property="Background" Value="#4A305F"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Chrome" Property="Background" Value="#201A2C"/>
+                                <Setter TargetName="Chrome" Property="BorderBrush" Value="#3C3049"/>
+                                <Setter Property="Foreground" Value="#796D85"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
             <Style.Triggers>
-                <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#39496E"/>
-                </Trigger>
+                <EventTrigger RoutedEvent="Button.MouseEnter">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                             To="1.025" Duration="0:0:0.14"/>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                             To="1.025" Duration="0:0:0.14"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
+                <EventTrigger RoutedEvent="Button.MouseLeave">
+                    <BeginStoryboard>
+                        <Storyboard>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                             To="1" Duration="0:0:0.18"/>
+                            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                             To="1" Duration="0:0:0.18"/>
+                        </Storyboard>
+                    </BeginStoryboard>
+                </EventTrigger>
             </Style.Triggers>
         </Style>
-        <Style x:Key="AccentButton" TargetType="Button">
-            <Setter Property="Background" Value="#6177E9"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="18,10"/>
-            <Setter Property="Margin" Value="0,0,8,0"/>
-            <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="MinHeight" Value="36"/>
+        <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#55346F"/>
+            <Setter Property="BorderBrush" Value="#9667BB"/>
+            <Setter Property="Foreground" Value="#F0E3FC"/>
+        </Style>
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#372332"/>
+            <Setter Property="BorderBrush" Value="#6E435C"/>
+            <Setter Property="Foreground" Value="#E6B4C8"/>
         </Style>
         <Style TargetType="TextBox">
-            <Setter Property="Background" Value="#161F35"/>
-            <Setter Property="Foreground" Value="#F3F5FF"/>
-            <Setter Property="BorderBrush" Value="#425171"/>
+            <Setter Property="Background" Value="#191326"/>
+            <Setter Property="Foreground" Value="#E2D8ED"/>
+            <Setter Property="CaretBrush" Value="#D7AFFF"/>
+            <Setter Property="SelectionBrush" Value="#71428C"/>
+            <Setter Property="BorderBrush" Value="#57416C"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Padding" Value="10,8"/>
-            <Setter Property="MinHeight" Value="36"/>
+            <Setter Property="Padding" Value="11,9"/>
+            <Setter Property="MinHeight" Value="39"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="BoxChrome" Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="9" Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsKeyboardFocusWithin" Value="True">
+                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#AE81D5"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style TargetType="CheckBox">
+            <Setter Property="Foreground" Value="#C8BBD5"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border x:Name="BoxChrome" Width="17" Height="17"
+                                    CornerRadius="4" BorderThickness="1"
+                                    BorderBrush="#75598B" Background="#24182F"
+                                    VerticalAlignment="Center">
+                                <Path x:Name="Tick" Data="M 3,8 L 7,12 L 14,4"
+                                      Stroke="#EBD6FF" StrokeThickness="2"
+                                      StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                      Visibility="Collapsed"/>
+                            </Border>
+                            <ContentPresenter Content="{TemplateBinding Content}"
+                                              Margin="9,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Tick" Property="Visibility" Value="Visible"/>
+                                <Setter TargetName="BoxChrome" Property="Background" Value="#69438A"/>
+                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#C5A1E1"/>
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="BoxChrome" Property="BorderBrush" Value="#C4A3DC"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.48"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
         <Style TargetType="ListBoxItem">
-            <Setter Property="Background" Value="#172038"/>
-            <Setter Property="Foreground" Value="#EAF0FF"/>
+            <Setter Property="Background" Value="#23182F"/>
+            <Setter Property="Foreground" Value="#E2D8ED"/>
+            <Setter Property="Margin" Value="0,0,0,9"/>
             <Setter Property="Padding" Value="12"/>
-            <Setter Property="Margin" Value="0,0,0,6"/>
-            <Style.Triggers>
-                <Trigger Property="IsSelected" Value="True">
-                    <Setter Property="Background" Value="#39496E"/>
-                    <Setter Property="Foreground" Value="White"/>
-                </Trigger>
-            </Style.Triggers>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border x:Name="RowChrome" CornerRadius="12"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="#453352" BorderThickness="1"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="RowChrome" Property="Background" Value="#32213E"/>
+                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#9D72B4"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="RowChrome" Property="Background" Value="#422654"/>
+                                <Setter TargetName="RowChrome" Property="BorderBrush" Value="#BA90D1"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
         </Style>
     </Window.Resources>
-    <Grid Margin="20">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="20"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="16"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        <Grid x:Name="HeaderLayout" Grid.Row="0">
+    <Grid ClipToBounds="True">
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0D0917" Offset="0"/>
+                <GradientStop Color="#1A102A" Offset="0.53"/>
+                <GradientStop Color="#0D0A19" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+        <Ellipse Width="560" Height="560" HorizontalAlignment="Right"
+                 VerticalAlignment="Top" Margin="0,-280,-170,0" Opacity="0.10"
+                 IsHitTestVisible="False" Fill="#7F419A">
+            <Ellipse.Effect><BlurEffect Radius="95"/></Ellipse.Effect>
+        </Ellipse>
+        <Ellipse Width="340" Height="340" HorizontalAlignment="Left"
+                 VerticalAlignment="Bottom" Margin="-140,0,0,-190" Opacity="0.08"
+                 IsHitTestVisible="False" Fill="#9E549C">
+            <Ellipse.Effect><BlurEffect Radius="70"/></Ellipse.Effect>
+        </Ellipse>
+        <Canvas IsHitTestVisible="False" Opacity="0.55" ClipToBounds="True">
+            <Ellipse Canvas.Left="68" Canvas.Top="68" Width="3" Height="3" Fill="#CA9ED9"/>
+            <Ellipse Canvas.Left="410" Canvas.Top="115" Width="2" Height="2" Fill="#E5CFAB"/>
+            <Ellipse Canvas.Left="925" Canvas.Top="83" Width="3" Height="3" Fill="#9B80BC"/>
+            <Ellipse Canvas.Left="740" Canvas.Top="273" Width="2" Height="2" Fill="#C6A8D6"/>
+            <Ellipse Canvas.Left="160" Canvas.Top="405" Width="2" Height="2" Fill="#A893C1"/>
+            <Ellipse Canvas.Left="970" Canvas.Top="545" Width="2" Height="2" Fill="#CEB88B"/>
+        </Canvas>
+        <Grid Margin="24,20,24,18">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
+                <RowDefinition Height="17"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="14"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel>
-                <TextBlock Text="MULTIGRAVITY" Foreground="#8398FF"
-                           FontSize="13" FontWeight="SemiBold"/>
-                <TextBlock Text="Profile Manager" FontSize="30" FontWeight="Bold" Margin="0,4,0,4"/>
-                <TextBlock Text="Independent Antigravity accounts, one familiar home."
-                           Foreground="#95A3C4"/>
-            </StackPanel>
-            <Button x:Name="RefreshButton" Grid.Column="1"
-                    Content="Refresh profiles" VerticalAlignment="Bottom"/>
-        </Grid>
-        <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
-                      HorizontalScrollBarVisibility="Disabled" Focusable="False">
-          <Grid x:Name="ProfilesLayout">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="1.1*"/>
-                <ColumnDefinition Width="18"/>
-                <ColumnDefinition Width="1*"/>
-            </Grid.ColumnDefinitions>
-            <Border x:Name="ProfilesPanel" Grid.Column="0" Background="#11192D" CornerRadius="16" Padding="19" MinHeight="410">
-                <Grid>
+            <Grid x:Name="HeaderLayout" Grid.Row="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,7">
+                        <TextBlock Text="&#x2726;" Foreground="#C6A87D" FontSize="17" Margin="0,0,9,0"/>
+                        <TextBlock Text="MULTIGRAVITY" Foreground="#C6A87D"
+                                   FontSize="12" FontWeight="SemiBold"/>
+                        <TextBlock Text="   /   PROFILE CONSTELLATION" Foreground="#867593"
+                                   FontSize="11" VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <TextBlock Text="Profile Manager" Foreground="#E8DAF3"
+                               FontSize="30" FontWeight="Light" Margin="0,0,0,4"/>
+                    <TextBlock Text="Every identity, its own orbit."
+                               Foreground="#A899B5" FontSize="12"/>
+                </StackPanel>
+                <Button x:Name="RefreshButton" Grid.Column="1"
+                        Content="&#x21BB;  Refresh" VerticalAlignment="Bottom"
+                        Margin="12,0,0,1"/>
+            </Grid>
+            <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                <Grid x:Name="ProfilesLayout">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="12"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="18"/>
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
-                    <DockPanel>
-                        <TextBlock Text="PROFILES" FontWeight="SemiBold" Foreground="#B5C3E7"/>
-                        <TextBlock x:Name="CountText" Text="0 profiles" DockPanel.Dock="Right"
-                                   Foreground="#7E8CAB" HorizontalAlignment="Right"/>
-                    </DockPanel>
-                    <ListBox x:Name="ProfileList" Grid.Row="2" MaxHeight="360" MinHeight="160"
-                             Background="Transparent" BorderThickness="0"
-                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                        <ListBox.ItemTemplate>
-                            <DataTemplate>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel>
-                                        <TextBlock Text="{Binding Name}" FontSize="16"
-                                                   FontWeight="SemiBold"/>
-                                        <TextBlock Text="{Binding LastModified}"
-                                                   Foreground="#A0AECF" FontSize="11" Margin="0,5,0,0"/>
-                                    </StackPanel>
-                                    <Border Grid.Column="1" Background="#263858"
-                                            CornerRadius="8" Padding="8,4"
-                                            VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding Type}" FontSize="11"
-                                                   Foreground="#B9CBFF"/>
-                                    </Border>
-                                </Grid>
-                            </DataTemplate>
-                        </ListBox.ItemTemplate>
-                    </ListBox>
-                    <StackPanel Grid.Row="4">
-                        <TextBlock Text="NEW PROFILE" Foreground="#A8B6DA"
-                                   FontWeight="SemiBold" Margin="0,0,0,7"/>
-                        <TextBox x:Name="NewNameInput" MaxLength="64"/>
-                        <WrapPanel Margin="0,10,0,0">
-                            <CheckBox x:Name="SharedCheck" Margin="0,0,8,8" Content="Shared extensions and settings"
-                                      Foreground="#B6C4E6" VerticalAlignment="Center"/>
-                            <Button x:Name="CreateButton" Style="{StaticResource AccentButton}"
-                                    Content="Create" MinWidth="110" Margin="0,0,0,8"/>
-                        </WrapPanel>
-                    </StackPanel>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1.08*"/>
+                        <ColumnDefinition Width="18"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+                    <Border x:Name="ProfilesPanel" Grid.Column="0"
+                            BorderThickness="1" BorderBrush="#544068"
+                            Background="#D9181025" CornerRadius="18"
+                            Padding="20" MinHeight="400">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="16"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="18"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="&#x2726;" Foreground="#C6A87D"
+                                               Margin="0,0,8,0" FontSize="13"/>
+                                    <TextBlock Text="YOUR PROFILES" Foreground="#D4C2E0"
+                                               FontWeight="SemiBold" FontSize="12"/>
+                                </StackPanel>
+                                <TextBlock x:Name="CountText" Grid.Column="1"
+                                           Text="0 profiles" Foreground="#A693B8" FontSize="12"/>
+                            </Grid>
+                            <ListBox x:Name="ProfileList" Grid.Row="2"
+                                     Background="Transparent" BorderThickness="0"
+                                     MaxHeight="315" MinHeight="145"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <Border Width="32" Height="32" CornerRadius="9"
+                                                    BorderThickness="1" BorderBrush="#705283"
+                                                    Background="#392447" VerticalAlignment="Center"
+                                                    Margin="0,0,11,0">
+                                                <TextBlock Text="&#x2726;" HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center" Foreground="#C7A7D4"
+                                                           FontSize="16"/>
+                                            </Border>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding Name}" Foreground="#E6DBEF"
+                                                           FontSize="15" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding LastModified}" Foreground="#A194AE"
+                                                           FontSize="10.5" Margin="0,4,0,0"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="2" BorderBrush="#594360"
+                                                    BorderThickness="1" Background="#2F203B"
+                                                    CornerRadius="7" Padding="7,3" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Type}" Foreground="#BFA7D1"
+                                                           FontSize="10.5"/>
+                                            </Border>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <StackPanel Grid.Row="4">
+                                <Border Background="#644A6C" Height="1" Opacity="0.4"
+                                        Margin="0,0,0,17"/>
+                                <TextBlock Text="CREATE NEW PROFILE" Foreground="#CBB2D8"
+                                           FontWeight="SemiBold" FontSize="11" Margin="0,0,0,10"/>
+                                <TextBox x:Name="NewNameInput" MaxLength="64"/>
+                                <WrapPanel Margin="0,12,0,0">
+                                    <CheckBox x:Name="SharedCheck" Content="Shared settings"
+                                              Margin="0,4,12,9" />
+                                    <Button x:Name="CreateButton" Content="&#x2726;  Create profile"
+                                            Style="{StaticResource AccentButton}"
+                                            MinWidth="140" Margin="0,0,0,8"/>
+                                </WrapPanel>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                    <Border x:Name="DetailsPanel" Grid.Column="2"
+                            BorderThickness="1" BorderBrush="#544068"
+                            Background="#DF1B1228" CornerRadius="18" Padding="22">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="&#x2726;" Foreground="#C6A87D"
+                                           FontSize="13" Margin="0,0,8,0"/>
+                                <TextBlock Text="SELECTED IDENTITY" Foreground="#D4C2E0"
+                                           FontWeight="SemiBold" FontSize="12"/>
+                            </StackPanel>
+                            <TextBlock x:Name="SelectedName" Text="Select a profile"
+                                       TextWrapping="Wrap" Foreground="#E8DAF3"
+                                       FontWeight="Light" FontSize="26" Margin="0,5,0,6"/>
+                            <TextBlock x:Name="SelectedType" Text="No profile selected"
+                                       Foreground="#BD9CC9" FontSize="12"/>
+                            <TextBlock x:Name="SelectedPath" TextWrapping="Wrap"
+                                       Foreground="#8E81A3" FontSize="11"
+                                       Margin="0,12,0,18"/>
+                            <Button x:Name="LaunchButton" Content="&#x2726;  Launch Antigravity"
+                                    Style="{StaticResource AccentButton}" Margin="0,0,0,12"/>
+                            <CheckBox x:Name="IsolatedAuthCheck" Content="Independent login"
+                                      Margin="0,0,0,7"/>
+                            <TextBlock Text="Store sign-in files separately for this profile. Keep profile folders private."
+                                       Foreground="#9786A8" TextWrapping="Wrap"
+                                       FontSize="11" Margin="0,0,0,14"/>
+                            <Button x:Name="OpenFolderButton" Content="Open profile folder"
+                                    Margin="0,0,0,18"/>
+                            <Border Background="#644A6C" Height="1" Opacity="0.4"
+                                    Margin="0,0,0,17"/>
+                            <TextBlock Text="RENAME PROFILE" Foreground="#CBB2D8"
+                                       FontSize="11" FontWeight="SemiBold" Margin="0,0,0,10"/>
+                            <TextBox x:Name="RenameInput" MaxLength="64" Margin="0,0,0,13"/>
+                            <WrapPanel Margin="0,0,0,13">
+                                <Button x:Name="RenameButton" Content="Rename"
+                                        MinWidth="120" Margin="0,0,8,8"/>
+                                <Button x:Name="DeleteButton" Content="Delete profile"
+                                        Style="{StaticResource DangerButton}"
+                                        MinWidth="133" Margin="0,0,0,8"/>
+                            </WrapPanel>
+                            <TextBlock Text="Deletion permanently removes this profile and its local settings."
+                                       TextWrapping="Wrap" Foreground="#857790" FontSize="11"/>
+                        </StackPanel>
+                    </Border>
                 </Grid>
-            </Border>
-            <Border x:Name="DetailsPanel" Grid.Column="2" Background="#11192D" CornerRadius="16" Padding="22">
-                <StackPanel>
-                    <TextBlock Text="SELECTED PROFILE" FontWeight="SemiBold"
-                               Foreground="#A8B6DA"/>
-                    <TextBlock x:Name="SelectedName" Text="Select a profile"
-                               FontWeight="Bold" FontSize="27" Margin="0,13,0,6"/>
-                    <TextBlock x:Name="SelectedType" Text="No profile selected"
-                               Foreground="#9BADD5" Margin="0,0,0,12"/>
-                    <TextBlock x:Name="SelectedPath" TextWrapping="Wrap"
-                               Foreground="#8999BC" FontSize="12" Margin="0,0,0,22"/>
-                    <Button x:Name="LaunchButton" Content="Launch Antigravity"
-                            Style="{StaticResource AccentButton}" Margin="0,0,0,9"/>
-                    <CheckBox x:Name="IsolatedAuthCheck"
-                              Content="Independent login"
-                              Foreground="#B6C4E6" Margin="0,3,0,7"/>
-                    <TextBlock Text="Keeps account credentials in this profile instead of the shared Windows credential store. Protect your profile files."
-                               TextWrapping="Wrap" FontSize="11"
-                               Foreground="#91A1C2" Margin="0,0,0,11"/>
-                    <Button x:Name="OpenFolderButton" Content="Open profile folder"
-                            Margin="0,0,0,16"/>
-                    <TextBlock Text="RENAME PROFILE" Foreground="#A8B6DA"
-                               FontWeight="SemiBold" Margin="0,0,0,8"/>
-                    <TextBox x:Name="RenameInput" MaxLength="64"
-                             Margin="0,0,0,10"/>
-                    <WrapPanel Margin="0,0,0,16">
-                        <Button x:Name="RenameButton" Content="Rename"/>
-                        <Button x:Name="DeleteButton" Content="Delete profile"
-                                Background="#512E42" Foreground="#FFD2D8"/>
-                    </WrapPanel>
-                    <TextBlock Text="Profile deletion removes its account data, settings and local extensions."
-                               TextWrapping="Wrap" FontSize="12" Foreground="#7F90B3"/>
-                </StackPanel>
-            </Border>
-        </Grid>
-        </ScrollViewer>
-        <Grid Grid.Row="4">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <TextBlock x:Name="StatusText" Grid.Column="0" Foreground="#99AAD1"
-                       Text="Ready." TextTrimming="CharacterEllipsis"/>
-            <TextBlock Grid.Column="1" Text="Windows PowerShell 5.1 / WPF"
-                       Margin="12,0,0,0" Foreground="#667898"/>
+            </ScrollViewer>
+            <Grid Grid.Row="4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusText" Text="Ready."
+                           Foreground="#B7A5CB" FontSize="11"
+                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="&#x2726;   ASTRAL INTERFACE"
+                           Foreground="#8A769E" FontSize="10" Margin="12,0,0,0"
+                           VerticalAlignment="Center"/>
+            </Grid>
         </Grid>
     </Grid>
 </Window>
