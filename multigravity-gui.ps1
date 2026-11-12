@@ -325,7 +325,6 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
         </Style>
     </Window.Resources>
     <Grid ClipToBounds="True">
-        <Canvas x:Name="FxSky" ClipToBounds="True" Panel.ZIndex="0" IsHitTestVisible="False" />
         <Grid.Background>
             <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                 <GradientStop Color="#121317" Offset="0"/>
@@ -333,6 +332,7 @@ $script:PSExe = Join-Path $PSHOME 'powershell.exe'
                 <GradientStop Color="#101115" Offset="1"/>
             </LinearGradientBrush>
         </Grid.Background>
+        <Canvas x:Name="FxSky" ClipToBounds="True" Panel.ZIndex="0" IsHitTestVisible="False" />
         <!-- Animated low-opacity aurora layers come from FxSky. -->
         <Canvas IsHitTestVisible="False" Opacity="0.55" ClipToBounds="True">
             <Ellipse Canvas.Left="68" Canvas.Top="68" Width="3" Height="3" Fill="#CA9ED9"/>
