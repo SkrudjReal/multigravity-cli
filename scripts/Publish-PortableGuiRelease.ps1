@@ -28,8 +28,10 @@ $assets = @(
 foreach ($path in $assets) {
     if (-not (Test-Path -LiteralPath $path)) { throw "Missing compiled asset: $path" }
 }
-& gh release view $Tag --repo $Repo 2>$null
-$exists = $LASTEXITCODE -eq 0
+$releasesJson = & gh release list --repo $Repo --limit 100 --json tagName
+if ($LASTEXITCODE -ne 0) { throw 'Cannot read GitHub release list.' }
+$releases = @($releasesJson | ConvertFrom-Json)
+$exists = @($releases | Where-Object { $_.tagName -eq $Tag }).Count -gt 0
 if ($exists) {
     & gh release upload $Tag @assets --repo $Repo --clobber
 } else {
