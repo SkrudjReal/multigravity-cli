@@ -140,6 +140,33 @@ The installer updates scripts and the branded launcher in
 `~/.local/bin`, **not** the existing profiles in
 `~/AntigravityProfiles`.
 
+### Portable single-file EXE release
+
+The new `multigravity-gui-portable-launcher.cs` embeds the CLI,
+WPF manager, custom icon, and particle source into **one runnable Windows EXE**.
+It extracts its bundled source files to
+`%LOCALAPPDATA%\Multigravity\GlassSakuraPortable-v0.1.0`
+at startup. Antigravity IDE remains a separate prerequisite; no private
+Google OAuth tokens or profile directories are included in the executable.
+
+The Windows build and GitHub prerelease pipeline is defined in
+`.github/workflows/release-windows-gui.yml`.
+The workflow is configured to publish prerelease tag
+`v0.1.0-glass-sakura` with the EXE and ZIP. A release only exists once
+GitHub Actions successfully runs and uploads those assets.
+
+If GitHub Actions cannot allocate a Windows runner, build and publish on a
+Windows machine with Windows PowerShell 5.1 and authenticated GitHub CLI:
+
+```powershell
+powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\scripts\Build-PortableGui.ps1
+gh auth login
+powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\scripts\Publish-PortableGuiRelease.ps1
+```
+
+The local build output will be `dist/MultigravityProfileManager.exe`
+and `dist/Multigravity-Glass-Sakura-Windows.zip`.
+
 ### Validate on Windows
 
 ```powershell
