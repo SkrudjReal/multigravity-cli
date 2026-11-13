@@ -1,1 +1,4 @@
 test.sh
+
+# Windows portable build output
+dist/
