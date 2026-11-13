@@ -1,0 +1,68 @@
+name: Build and publish Multigravity Windows GUI
+
+on:
+  push:
+    branches:
+      - feature/glass-sakura-cursor
+    paths:
+      - "multigravity-gui-portable-launcher.cs"
+      - "scripts/Build-PortableGui.ps1"
+      - ".github/workflows/release-windows-gui.yml"
+      - "multigravity-gui.ps1"
+      - "multigravity-effects.cs"
+      - "multigravity.ps1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Validate PowerShell 5.1 and WPF UI
+        shell: powershell
+        run: |
+          powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\tests\Test-WindowsGui.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Build portable single-file GUI and ZIP
+        shell: powershell
+        run: |
+          powershell.exe -NoProfile -STA -ExecutionPolicy Bypass -File .\scripts\Build-PortableGui.ps1
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Multigravity-Glass-Sakura-Windows
+          path: |
+            dist/MultigravityProfileManager.exe
+            dist/Multigravity-Glass-Sakura-Windows.zip
+            dist/README-Windows.txt
+          if-no-files-found: error
+
+      - name: Publish or update prerelease
+        shell: pwsh
+        env:
+          GH_TOKEN: __GITHUB_TOKEN__
+        run: |
+          $tag = "v0.1.0-glass-sakura"
+          $assets = @(
+            "dist/MultigravityProfileManager.exe",
+            "dist/Multigravity-Glass-Sakura-Windows.zip"
+          )
+          gh release view $tag --repo $env:GITHUB_REPOSITORY *> $null
+          if ($LASTEXITCODE -eq 0) {
+            gh release upload $tag @assets --repo $env:GITHUB_REPOSITORY --clobber
+          } else {
+            gh release create $tag @assets `
+              --repo $env:GITHUB_REPOSITORY `
+              --target $env:GITHUB_SHA `
+              --title "Multigravity Glass / Sakura Windows GUI v0.1.0" `
+              --notes "Experimental Windows GUI prerelease. Portable EXE embeds the PowerShell manager, profile CLI, icon and AURA-style effects; no install needed. Requires Windows PowerShell 5.1, .NET Framework 4.x and an installed Antigravity IDE. Independent login uses an undocumented workaround, so verify accounts individually." `
+              --prerelease
+          }
