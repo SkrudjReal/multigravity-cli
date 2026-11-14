@@ -142,6 +142,8 @@ The installer updates scripts and the branded launcher in
 
 ### Portable single-file EXE release
 
+**v0.1.1 fixes a startup privilege error:** all C# effects and taskbar interop are now compiled on Windows during packaging into `Multigravity.Runtime.dll`, so launching the portable EXE no longer invokes PowerShell `Add-Type -TypeDefinition` / `Add-Type -Path` to compile C# or create temporary compiler folders. The previous v0.1.0 prerelease is superseded.
+
 The new `multigravity-gui-portable-launcher.cs` embeds the CLI,
 WPF manager, custom icon, and particle source into **one runnable Windows EXE**.
 It extracts its bundled source files to
@@ -152,7 +154,7 @@ Google OAuth tokens or profile directories are included in the executable.
 The Windows build and GitHub prerelease pipeline is defined in
 `.github/workflows/release-windows-gui.yml`.
 The workflow is configured to publish prerelease tag
-`v0.1.0-glass-sakura` with the EXE and ZIP. A release only exists once
+`v0.1.1-glass-sakura` with the EXE and ZIP. A release only exists once
 GitHub Actions successfully runs and uploads those assets.
 
 If GitHub Actions cannot allocate a Windows runner, build and publish on a
