@@ -15,6 +15,13 @@ Add-Type -AssemblyName System.Xaml
 
 Add-Type -AssemblyName System.Drawing
 
+# Portable EXE ships a precompiled runtime DLL. Loading it skips both
+# Add-Type compilation operations (which require temp-directory privileges).
+$script:RuntimeDll = Join-Path $PSScriptRoot 'Multigravity.Runtime.dll'
+if (Test-Path -LiteralPath $script:RuntimeDll) {
+    [void][System.Reflection.Assembly]::LoadFrom($script:RuntimeDll)
+}
+
 # PowerShell is the host executable, so explicitly separate this app from
 # generic PowerShell windows in the taskbar before creating the WPF window.
 if (-not ('MultigravityTaskbar' -as [type])) {
@@ -648,7 +655,8 @@ $script:Window = [Windows.Markup.XamlReader]::Load($reader)
 $script:FxSky = $script:Window.FindName('FxSky')
 $script:FxSparks = $script:Window.FindName('FxSparks')
 $effectsFile = Join-Path $PSScriptRoot 'multigravity-effects.cs'
-if ((Test-Path -LiteralPath $effectsFile) -and ($env:MULTIGRAVITY_DISABLE_FX -ne '1')) {
+if ($env:MULTIGRAVITY_DISABLE_FX -ne '1' -and
+    (('Multigravity.FrostEffects' -as [type]) -or (Test-Path -LiteralPath $effectsFile))) {
     try {
         if (-not ('Multigravity.FrostEffects' -as [type])) {
             $references = @(
