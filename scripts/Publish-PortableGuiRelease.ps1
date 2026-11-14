@@ -1,7 +1,7 @@
 # Fallback release uploader for machines where GitHub-hosted Windows runners
 # cannot be allocated. Requires Windows PowerShell 5.1 and authenticated gh CLI.
 param(
-    [string]$Tag = 'v0.1.0-glass-sakura',
+    [string]$Tag = 'v0.1.1-glass-sakura',
     [string]$Repo = 'SkrudjReal/multigravity-cli'
 )
 $ErrorActionPreference = 'Stop'
@@ -35,7 +35,7 @@ $exists = @($releases | Where-Object { $_.tagName -eq $Tag }).Count -gt 0
 if ($exists) {
     & gh release upload $Tag @assets --repo $Repo --clobber
 } else {
-    & gh release create $Tag @assets --repo $Repo --target 'feature/glass-sakura-cursor' --title 'Multigravity Glass / Sakura Windows GUI v0.1.0' --notes 'Experimental Windows single-file WPF GUI. Bundles its own UI, CLI, effects, and icon. Requires Windows PowerShell 5.1, .NET Framework 4.x, and an installed Antigravity IDE. Independent login is experimental.' --prerelease
+    & gh release create $Tag @assets --repo $Repo --target 'feature/glass-sakura-cursor' --title 'Multigravity Glass / Sakura Windows GUI v0.1.1' --notes 'v0.1.1 precompiles WPF runtime to avoid Add-Type temp directory permission errors. Experimental Windows single-file WPF GUI. Bundles its own UI, CLI, effects, and icon. Requires Windows PowerShell 5.1, .NET Framework 4.x, and an installed Antigravity IDE. Independent login is experimental.' --prerelease
 }
 if ($LASTEXITCODE -ne 0) { throw "GitHub release upload failed, exit $LASTEXITCODE" }
 Write-Host "Published: https://github.com/$Repo/releases/tag/$Tag"
