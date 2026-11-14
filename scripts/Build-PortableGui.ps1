@@ -56,6 +56,38 @@ $csc = $compilerPaths | Where-Object { Test-Path -LiteralPath $_ } |
     Select-Object -First 1
 if (-not $csc) { throw 'Requires .NET Framework 4.x C# compiler on Windows.' }
 
+# Precompile both dynamic Add-Type blocks. At runtime, the portable EXE
+# needs no CodeDOM compiler, temporary build directory, or elevated privilege.
+Add-Type -AssemblyName PresentationFramework
+Add-Type -AssemblyName PresentationCore
+Add-Type -AssemblyName WindowsBase
+Add-Type -AssemblyName System.Xaml
+$runtimeDll = Join-Path $bundleDir 'Multigravity.Runtime.dll'
+$runtimeReferences = @(
+    [System.Windows.Window].Assembly.Location,
+    [System.Windows.Media.Brush].Assembly.Location,
+    [System.Windows.DependencyObject].Assembly.Location,
+    [System.Windows.Controls.Canvas].Assembly.Location,
+    [System.Xaml.XamlObjectWriter].Assembly.Location
+) | Select-Object -Unique
+$runtimeArgs = @('/nologo', '/target:library', ('/out:"' + $runtimeDll + '"'))
+foreach ($reference in $runtimeReferences) {
+    $runtimeArgs += ('/reference:"' + $reference + '"')
+}
+$runtimeArgs += ('"' + (Join-Path $root 'multigravity-effects.cs') + '"')
+$runtimeArgs += ('"' + (Join-Path $root 'multigravity-taskbar.cs') + '"')
+& $csc @runtimeArgs
+if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $runtimeDll)) {
+    throw "Precompiling WPF runtime DLL failed with exit code $LASTEXITCODE"
+}
+# Fail the build if the embedded DLL does not contain BOTH components.
+$runtimeAssembly = [System.Reflection.Assembly]::LoadFrom($runtimeDll)
+foreach ($typeName in @('MultigravityTaskbar', 'Multigravity.FrostEffects')) {
+    if ($null -eq $runtimeAssembly.GetType($typeName)) {
+        throw "Precompiled runtime DLL is missing $typeName"
+    }
+}
+
 $scriptFile = Join-Path $root 'multigravity-gui-portable-launcher.cs'
 $exeFile = Join-Path $outDir 'MultigravityProfileManager.exe'
 $automation = [System.Management.Automation.PSObject].Assembly.Location
@@ -68,7 +100,7 @@ $arguments = @(
     '/reference:System.Core.dll',
     '/reference:System.Windows.Forms.dll'
 )
-foreach ($name in @($sourceNames + @('multigravity-gui-icon.png','multigravity-gui.ico'))) {
+foreach ($name in @($sourceNames + @('multigravity-gui-icon.png','multigravity-gui.ico','Multigravity.Runtime.dll'))) {
     $filePath = Join-Path $bundleDir $name
     $arguments += ('/resource:"' + $filePath + '",Multigravity.Bundle.' + $name)
 }
@@ -88,10 +120,10 @@ Multigravity Profile Manager - Glass / Sakura (Windows portable)
 
 Double-click MultigravityProfileManager.exe to launch.
 
-This is a SINGLE-FILE executable with the PowerShell GUI, profile CLI,
+This is a SINGLE-FILE executable with the PowerShell GUI, profile CLI, precompiled WPF runtime DLL,
 animations, and icon EMBEDDED INSIDE IT. On first start it extracts the
 bundled application files to:
-  %LOCALAPPDATA%\Multigravity\GlassSakuraPortable-v0.1.0
+  %LOCALAPPDATA%\Multigravity\GlassSakuraPortable-v0.1.1
 
 Requires: Windows 10/11, Windows PowerShell 5.1, .NET Framework 4.x,
 and a separately installed Antigravity IDE.
