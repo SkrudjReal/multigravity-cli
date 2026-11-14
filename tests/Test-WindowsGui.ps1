@@ -284,3 +284,31 @@ Write-Host 'NOTE: Mouse glow and animation smoothness still require a visual Win
 
 
 
+
+
+# Portable v0.1.1 must load compiled WPF types rather than invoke CodeDOM
+# Add-Type at startup. Both C# blocks are compiled by the Windows packager.
+$portableBuild = [IO.File]::ReadAllText((Join-Path $root 'scripts\Build-PortableGui.ps1'))
+$portableHost = [IO.File]::ReadAllText((Join-Path $root 'multigravity-gui-portable-launcher.cs'))
+$taskbarSource = [IO.File]::ReadAllText((Join-Path $root 'multigravity-taskbar.cs'))
+$runtimeLoad = $source.IndexOf('Assembly]::LoadFrom($script:RuntimeDll)')
+$taskbarRuntimeFallback = $source.IndexOf('Add-Type -TypeDefinition')
+$fxRuntimeFallback = $source.IndexOf('Add-Type -Path $effectsFile')
+if ($runtimeLoad -lt 0 -or $taskbarRuntimeFallback -le $runtimeLoad -or
+    $fxRuntimeFallback -le $runtimeLoad) {
+    throw 'Portable runtime must load the precompiled DLL before any Add-Type compilation fallback.'
+}
+foreach ($fragment in @('Multigravity.Runtime.dll', 'multigravity-taskbar.cs',
+                        '/target:library', 'System.Xaml')) {
+    if (-not $portableBuild.Contains($fragment)) {
+        throw "Portable builder is missing precompiled runtime feature: $fragment"
+    }
+}
+if (-not $portableHost.Contains('"Multigravity.Runtime.dll"') -or
+    -not $portableHost.Contains('GlassSakuraPortable-v0.1.1')) {
+    throw 'Portable launcher must embed the precompiled DLL and extract into a clean v0.1.1 directory.'
+}
+if (-not $taskbarSource.Contains('class MultigravityTaskbar')) {
+    throw 'Missing precompiled taskbar interop class.'
+}
+Write-Host 'PASS: v0.1.1 portable build precompiles both Add-Type dependencies.'
