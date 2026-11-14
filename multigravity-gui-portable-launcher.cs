@@ -16,6 +16,7 @@ namespace Multigravity {
             "multigravity.ps1",
             "multigravity-gui.ps1",
             "multigravity-effects.cs",
+            "Multigravity.Runtime.dll",
             "multigravity-gui-icon.png",
             "multigravity-gui.ico"
         };
@@ -23,7 +24,7 @@ namespace Multigravity {
         // A separate per-user install directory keeps account/profile data elsewhere.
         private static readonly string UnpackDirectory = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Multigravity", "GlassSakuraPortable-v0.1.0");
+            "Multigravity", "GlassSakuraPortable-v0.1.1");
 
         [STAThread]
         private static int Main(string[] args) {
